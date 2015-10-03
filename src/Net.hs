@@ -14,6 +14,6 @@ downLoad name u = do
  where
     get url = let uri = case parseURI url of
                           Nothing -> error $ "Invalid URI: " ++ url
-                          Just u -> u in
+                          Just u_ -> u_ in
               simpleHTTP (defaultGETRequest_ uri) >>= getResponseBody
 

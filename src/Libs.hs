@@ -3,9 +3,9 @@ module Libs where
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind #-}
 import Text.ParserCombinators.Parsec
+import Data.Char
 import Net
 
--- import Control.Applicative hiding ((<|>), optional, many)
 sep :: Char
 sep = ':'
 
@@ -21,6 +21,9 @@ depsToken = "deps"
 envToken :: String
 envToken = "env"
 
+mvnURL :: String
+mvnURL = "http://mvnrepository.com/artifact/"
+
 
 -- eg 'org.apache.felix:org.apache.felix.bundlerepository:2.0.6'
 data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
@@ -33,6 +36,10 @@ fName l = (grp l) ++ "-" ++ (version l) ++ ".jar"
 int :: (Integral a, Read a) => Parser a
 int =  fmap read  (many1 digit)
 -- ----------------------------------------------------------------------------
+ciString s tok = mapM ciChar s <?> tok
+       where
+             -- ciChar :: Char -> Parissue Char
+             ciChar c = char (toLower c) <|> char (toUpper c)
 
 letterDigUndrDot :: Parser String
 letterDigUndrDot = do
@@ -88,10 +95,10 @@ testDepsParser text = do
 -- ----------------------------------------------------------------------------
 -- data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 makeURL :: LibRef -> String
-makeURL l = "http://mvnrepository.com/artifact/" ++ (grp l) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l)
+makeURL l = mvnURL  ++ (grp l) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l)
 
 
---depRetriever :: Deps -> IO ()
+-- depRetriever :: Deps -> IO ()
 depRetriever deps = do
   mapM_ downLoad (map (\d -> makeURL d) deps)
 
