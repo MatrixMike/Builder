@@ -5,6 +5,7 @@ module Libs where
 import Text.ParserCombinators.Parsec
 import Data.Char
 import Net
+import System.IO
 
 sep :: Char
 sep = ':'
@@ -15,19 +16,36 @@ openBrace = '{'
 closeBrace :: Char
 closeBrace = '}'
 
-depsToken :: String
-depsToken = "deps"
+projectToken :: String
+projectToken = "project"
 
 envToken :: String
 envToken = "env"
+
+
+depsToken :: String
+depsToken = "deps"
+
+
+buildToken :: String
+buildToken = "build"
+deployToken :: String
+deployToken = "deploy"
 
 mvnURL :: String
 mvnURL = "http://mvnrepository.com/artifact/"
 
 
+
 -- eg 'org.apache.felix:org.apache.felix.bundlerepository:2.0.6'
 data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
+
+type Env = String
 type Deps = [LibRef]
+type Build = String
+type Deploy = String
+
+data Project = Project {env :: Env, deps :: Deps, build :: Build, deploy :: Deploy} deriving (Show)
 
 fName :: LibRef -> String
 fName l = (grp l) ++ "-" ++ (version l) ++ ".jar"
@@ -36,15 +54,64 @@ fName l = (grp l) ++ "-" ++ (version l) ++ ".jar"
 int :: (Integral a, Read a) => Parser a
 int =  fmap read  (many1 digit)
 -- ----------------------------------------------------------------------------
-ciString s tok = mapM ciChar s <?> tok
-       where
-             -- ciChar :: Char -> Parissue Char
-             ciChar c = char (toLower c) <|> char (toUpper c)
-
 letterDigUndrDot :: Parser String
 letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.')
+-- ----------------------------------------------------------------------------
+projectParser :: Parser Project
+projectParser = do
+  spaces
+  string projectToken
+  char openBrace
+  spaces
 
+  env    <- envParser
+  deps   <- depsParser
+  build  <- buildParser
+  deploy <- deployParser
+
+  spaces
+  char closeBrace
+
+  return $ Project env deps build deploy
+-- ----------------------------------------------------------------------------
+envParser :: Parser Env
+envParser = do
+  spaces
+  string envToken
+  char openBrace
+  spaces
+  char closeBrace
+  return $ "env..."
+-- ----------------------------------------------------------------------------
+depsParser :: Parser Deps
+depsParser = do
+  spaces
+  string depsToken
+  char openBrace
+  spaces
+  manyDep <- many libRefParser
+  spaces
+  char closeBrace
+  return $ manyDep
+-- ----------------------------------------------------------------------------
+buildParser :: Parser Build
+buildParser = do
+  spaces
+  string buildToken
+  char openBrace
+  spaces
+  char closeBrace
+  return $ "build..."
+-- ----------------------------------------------------------------------------
+deployParser :: Parser Deploy
+deployParser = do
+  spaces
+  string deployToken
+  char openBrace
+  spaces
+  char closeBrace
+  return $ "deploy..."
 -- ----------------------------------------------------------------------------
 
 libRefParser :: Parser LibRef
@@ -60,49 +127,53 @@ libRefParser = do
   spaces
   return $ LibRef grp art ver
 -- ----------------------------------------------------------------------------
-depsParser :: Parser Deps
-depsParser = do
-  spaces
-  string depsToken
-  char openBrace
-  spaces
-  manyDep <- many libRefParser
-  spaces
-  char closeBrace
-  return $ manyDep
--- ----------------------------------------------------------------------------
-
 testLibRefParser = do
   let  lref = parse libRefParser "Libref" "org.apache.felix:org.apache.felix.bundlerepository:2.0.6"
   case lref of 
     Left err  ->  show err
     Right val ->  show val
-
 -- ----------------------------------------------------------------------------
-
 testManyLibRefParser = do
   let  lref = parse (many libRefParser) "Libref" ""
   case lref of 
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
-
 testDepsParser text = do 
   let lref = parse depsParser "LibRef" text
   case lref of 
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
+
 -- data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 makeURL :: LibRef -> String
 makeURL l = mvnURL  ++ (grp l) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l)
 
+downLoad' :: LibRef -> IO ()
+downLoad' l = downLoad (fName l) (makeURL l)
 
--- depRetriever :: Deps -> IO ()
-depRetriever deps = do
-  mapM_ downLoad (map (\d -> makeURL d) deps)
+-- depRetriever :: [LibRef] 
+depRetriever deps = 
+    mapM_ downLoad'  deps
 
-  
+
+-- main = do
+--   d <- readFile "deps.txt" 
+--   let parsedDeps = parse depsParser "Parsing deps" d
+
+--   print parsedDeps
+--   case parsedDeps of 
+--     Left msg -> print  msg
+--     Right v  -> depRetriever v
+
+main = do
+  pr <- readFile "project.txt" 
+  let p = parse projectParser "Parsing deps" pr
+
+  print p
+    
+
 -- http://mvnrepository.com/artifact/io.fabric8/fabric8-arquillian/2.2.38
 --http://central.maven.org/maven2/io/fabric8/fabric8-arquillian/2.2.38/fabric8-arquillian-2.2.38.jar
 
