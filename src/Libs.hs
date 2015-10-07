@@ -36,7 +36,7 @@ deployToken :: String
 deployToken = "deploy"
 
 mvnURL :: String
-mvnURL = "http://central.maven.org/maven2/"
+mvnURL = "httpdd://central.maven.org/maven2/"
 
 
 
@@ -176,7 +176,7 @@ main = do
   d <- readFile "deps.txt" 
   let parsedDeps = parse depsParser "Parsing deps" d
 
-  print parsedDeps
+  --print parsedDeps
   case parsedDeps of 
     Left msg -> print  msg
     Right v  -> depRetriever v
