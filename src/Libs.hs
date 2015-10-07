@@ -190,5 +190,5 @@ runProject = do
     Left msg -> putStrLn $ show  msg
     Right pr -> do depRetriever $ deps pr
 
---   putStrLn p
-main = runProject `catchIOError` errHandler
+libsMain :: IO ()
+libsMain = runProject `catchIOError` errHandler
