@@ -12,6 +12,7 @@ import Control.Exception
 
 downLoad :: String -> String -> IO ()
 downLoad n u = do
+    putStrLn $ "doing... " ++ n 
     r <- try $ get u
     case r of
         -- Left (e::HttpException) -> do putStrLn "-------" 
@@ -27,7 +28,10 @@ downLoad n u = do
         Left (e) -> do putStrLn $ show e
         Right res -> do 
             case (res ^. responseStatus ^. statusCode) of
-                200 -> ByteString.writeFile n bin where bin = res ^. responseBody
+                200 -> do 
+                    
+                    ByteString.writeFile n bin where bin = res ^. responseBody
+                    
                 _   -> putStrLn "Bad code " 
 
  

@@ -36,7 +36,7 @@ deployToken :: String
 deployToken = "deploy"
 
 mvnURL :: String
-mvnURL = "httpdd://central.maven.org/maven2/"
+mvnURL = "http://central.maven.org/maven2/"
 
 
 
@@ -156,7 +156,9 @@ makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (ver
       
 -- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
-downLoad' l = downLoad (fName l) (makeURL l)
+downLoad' l = do 
+  putStrLn $ show l
+  downLoad (fName l) (makeURL l)
 -- ----------------------------------------------------------------------------
 
 -- depRetriever :: [LibRef] 
@@ -165,29 +167,28 @@ depRetriever deps =
 -- ----------------------------------------------------------------------------
 
 errHandler :: IOError -> IO ()  
-errHandler e = putStrLn (show e)
+errHandler e = putStrLn $ "ERROR! " ++ (show e) 
    -- | InvalidUrlException e = putStrLn "The file doesn't exist!"    
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
--- main = runProject `catchIOError` errHandler
--- runProject :: IO ()
--- runProject = do
-main = do
-  d <- readFile "deps.txt" 
-  let parsedDeps = parse depsParser "Parsing deps" d
 
-  --print parsedDeps
-  case parsedDeps of 
-    Left msg -> print  msg
-    Right v  -> depRetriever v
+runProject :: IO ()
+runProject = do
+-- main = do
+  -- d <- readFile "deps.txt" 
+  -- let parsedDeps = parse depsParser "Parsing deps" d
+
+  -- putStrLn $ show parsedDeps
+  -- case parsedDeps of 
+  --   Left msg -> putStrLn $ show  msg
+  --   Right v  -> depRetriever v
 
 -- main = do
---   pr <- readFile "project.txt" 
---   let p = parse projectParser "Parsing deps" pr
+  pr <- readFile "project.txt" 
+  let p = parse projectParser "Parsing deps" pr
+  case p of
+    Left msg -> putStrLn $ show  msg
+    Right pr -> do depRetriever $ deps pr
 
---   print p
-    
-
--- http://mvnrepository.com/artifact/io.fabric8/fabric8-arquillian/2.2.38
---http://central.maven.org/maven2/io/fabric8/fabric8-arquillian/2.2.38/fabric8-arquillian-2.2.38.jar
-
+--   putStrLn p
+main = runProject `catchIOError` errHandler

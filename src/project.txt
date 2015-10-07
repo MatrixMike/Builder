@@ -4,11 +4,17 @@ project{
       
     } 
     deps{
-     
-      "io.fabric8:fabric8-arquillian:2.2.38"
-    
 
-    }
+ "org.springframework:spring-aop:4.2.1.RELEASEx"
+ "HTTPClient:HTTPClient:0.3-3"
+ "org.apache.felix:org.apache.felix.scr.annotations:1.9.12"
+ "org.apache.felix:org.apache.felix.configadmin:1.8.8"
+
+
+
+
+
+}
     build{
       
     }
