@@ -185,7 +185,7 @@ runProject = do
 
 -- main = do
   pr <- readFile "project.txt" 
-  let p = parse projectParser "Parsing deps" pr
+  let p = parse projectParser "Parsing project" pr
   case p of
     Left msg -> putStrLn $ show  msg
     Right pr -> do depRetriever $ deps pr
