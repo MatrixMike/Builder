@@ -6,6 +6,8 @@ import Text.ParserCombinators.Parsec
 import Data.Char
 import Net
 import System.IO
+import System.IO.Error
+--import Network.Wreq
 
 sep :: Char
 sep = ':'
@@ -149,29 +151,38 @@ testDepsParser text = do
 -- data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 makeURL :: LibRef -> String
 makeURL l = mvnURL  ++ (grp l) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l)
-
+-- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
 downLoad' l = downLoad (fName l) (makeURL l)
+-- ----------------------------------------------------------------------------
 
 -- depRetriever :: [LibRef] 
 depRetriever deps = 
     mapM_ downLoad'  deps
+-- ----------------------------------------------------------------------------
 
+errHandler :: IOError -> IO ()  
+errHandler e  = putStrLn $ "Problem " ++ show e
+    -- | Exception e = putStrLn "The file doesn't exist!"    
+    -- | otherwise = ioError e  
+-- ----------------------------------------------------------------------------
+main = runProject `catchIOError` errHandler
+runProject :: IO ()
+runProject = do
+
+  d <- readFile "deps.txt" 
+  let parsedDeps = parse depsParser "Parsing deps" d
+
+  print parsedDeps
+  case parsedDeps of 
+    Left msg -> print  msg
+    Right v  -> depRetriever v
 
 -- main = do
---   d <- readFile "deps.txt" 
---   let parsedDeps = parse depsParser "Parsing deps" d
+--   pr <- readFile "project.txt" 
+--   let p = parse projectParser "Parsing deps" pr
 
---   print parsedDeps
---   case parsedDeps of 
---     Left msg -> print  msg
---     Right v  -> depRetriever v
-
-main = do
-  pr <- readFile "project.txt" 
-  let p = parse projectParser "Parsing deps" pr
-
-  print p
+--   print p
     
 
 -- http://mvnrepository.com/artifact/io.fabric8/fabric8-arquillian/2.2.38
