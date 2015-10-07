@@ -1,0 +1,36 @@
+project{
+  
+    env{
+      
+    } 
+    deps{
+
+		 "org.springframework:spring-aop:4.2.1.RELEASEx"
+		 "HTTPClient:HTTPClient:0.3-3"
+		 "org.apache.felix:org.apache.felix.scr.annotations:1.9.12"
+		 "org.apache.felix:org.apache.felix.configadmin:1.8.8"
+		 "org.eclipse.jetty:jetty-webapp:9.3.4.RC1"
+
+		 "cglib:cglib:3.1"
+
+		 "org.springframework:spring-aop:4.2.1.RELEASEx"
+		 "HTTPClient:HTTPClient:0.3-3"
+		 "org.apache.felix:org.apache.felix.scr.annotations:1.9.12"
+		 "org.apache.felix:org.apache.felix.configadmin:1.8.8"
+		 "org.eclipse.jetty:jetty-webapp:9.3.4.RC1"
+
+
+
+
+
+
+
+}
+    build{
+      
+    }
+
+    deploy{
+      
+    }
+}
