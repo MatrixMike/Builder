@@ -4,11 +4,9 @@ project{
       
     } 
     deps{
-      
-      "org.apache.felix:org.apache.felix.bundlerepository:2.0.7"
-      "org.apache.felix:org.apache.felix.bundlerepository:2.0.8"
-      "org.apache.felix:org.apache.felix.bundlerepository:2.0.9"
-      "org.apache.felix:org.apache.felix.bundlerepository:2.0.A"
+     
+      "io.fabric8:fabric8-arquillian:2.2.38"
+    
 
     }
     build{

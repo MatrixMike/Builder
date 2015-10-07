@@ -7,7 +7,8 @@ import Data.Char
 import Net
 import System.IO
 import System.IO.Error
---import Network.Wreq
+import Network.Wreq
+import Network.HTTP.Client
 
 sep :: Char
 sep = ':'
@@ -35,7 +36,7 @@ deployToken :: String
 deployToken = "deploy"
 
 mvnURL :: String
-mvnURL = "http://mvnrepository.com/artifact/"
+mvnURL = "http://central.maven.org/maven2/"
 
 
 
@@ -50,7 +51,7 @@ type Deploy = String
 data Project = Project {env :: Env, deps :: Deps, build :: Build, deploy :: Deploy} deriving (Show)
 
 fName :: LibRef -> String
-fName l = (grp l) ++ "-" ++ (version l) ++ ".jar"
+fName l = (artifact l) ++ "-" ++ (version l) ++ ".jar"
 -- ----------------------------------------------------------------------------
 
 int :: (Integral a, Read a) => Parser a
@@ -58,7 +59,7 @@ int =  fmap read  (many1 digit)
 -- ----------------------------------------------------------------------------
 letterDigUndrDot :: Parser String
 letterDigUndrDot = do
-   many1 (letter <|> digit <|> char '_' <|> char '.')
+   many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 -- ----------------------------------------------------------------------------
 projectParser :: Parser Project
 projectParser = do
@@ -150,7 +151,9 @@ testDepsParser text = do
 
 -- data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 makeURL :: LibRef -> String
-makeURL l = mvnURL  ++ (grp l) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l)
+makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l) 
+     where dotSlash s = map (\c -> if c == '.' then '/' else c) s  
+      
 -- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
 downLoad' l = downLoad (fName l) (makeURL l)
@@ -162,14 +165,14 @@ depRetriever deps =
 -- ----------------------------------------------------------------------------
 
 errHandler :: IOError -> IO ()  
-errHandler e  = putStrLn $ "Problem " ++ show e
-    -- | Exception e = putStrLn "The file doesn't exist!"    
+errHandler e = putStrLn (show e)
+   -- | InvalidUrlException e = putStrLn "The file doesn't exist!"    
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
-main = runProject `catchIOError` errHandler
-runProject :: IO ()
-runProject = do
-
+-- main = runProject `catchIOError` errHandler
+-- runProject :: IO ()
+-- runProject = do
+main = do
   d <- readFile "deps.txt" 
   let parsedDeps = parse depsParser "Parsing deps" d
 
