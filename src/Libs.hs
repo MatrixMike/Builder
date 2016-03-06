@@ -40,15 +40,23 @@ mvnURL = "http://central.maven.org/maven2/"
 
 
 
--- eg 'org.apache.felix:org.apache.felix.bundlerepository:2.0.6'
-data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 
 type Env = String
 type Deps = [LibRef]
-type Build = String
+-- eg 'org.apache.felix:org.apache.felix.bundlerepository:2.0.6'
+data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
+
+
+data Build = Build [Module] deriving (Show)
+type Name = String
+type Value = String
+data Item = Item (Name, Value) deriving (Show)
+data Module = Module {items :: [Item], deps :: Deps}  deriving (Show)
+
+
 type Deploy = String
 
-data Project = Project {env :: Env, deps :: Deps, build :: Build, deploy :: Deploy} deriving (Show)
+data Project = Project {env :: Env, build :: Build, deploy :: Deploy} deriving (Show)
 
 fName :: LibRef -> String
 fName l = (artifact l) ++ "-" ++ (version l) ++ ".jar"
@@ -61,6 +69,7 @@ letterDigUndrDot :: Parser String
 letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 -- ----------------------------------------------------------------------------
+
 projectParser :: Parser Project
 projectParser = do
   spaces
@@ -69,14 +78,13 @@ projectParser = do
   spaces
 
   env    <- envParser
-  deps   <- depsParser
   build  <- buildParser
   deploy <- deployParser
 
   spaces
   char closeBrace
 
-  return $ Project env deps build deploy
+  return $ Project env  build deploy
 -- ----------------------------------------------------------------------------
 envParser :: Parser Env
 envParser = do
@@ -103,9 +111,10 @@ buildParser = do
   spaces
   string buildToken
   char openBrace
-  spaces
+  modules <- many1 moduleParser
   char closeBrace
-  return $ "build..."
+  spaces
+  return $ Build modules
 -- ----------------------------------------------------------------------------
 deployParser :: Parser Deploy
 deployParser = do
@@ -120,16 +129,63 @@ deployParser = do
 libRefParser :: Parser LibRef
 libRefParser = do
   spaces
-  char '"'
   grp <- letterDigUndrDot
   char sep
   art <- letterDigUndrDot
   char sep
   ver <- letterDigUndrDot
-  char '"'
   spaces
   return $ LibRef grp art ver
 -- ----------------------------------------------------------------------------
+-- data Item = (Name, Value)
+-- data Module = Module [Item]
+itemParser :: Parser Item
+itemParser = do
+  spaces
+  name <- many1 letter
+  spaces
+  char ':'
+  spaces
+  val  <- many1 letter
+  spaces
+  return $ Item (name, val)
+-- ----------------------------------------------------------------------------
+moduleParser :: Parser Module
+moduleParser = do
+  spaces
+  string "module"
+  spaces
+  char '{'
+  spaces
+  deps <-   depsParser
+  spaces
+  name  <- nameParser
+  items <- many1 itemParser
+  spaces
+  char '}'
+  spaces
+  return $ Module (name : items) deps
+-- ----------------------------------------------------------------------------
+nameParser :: Parser Item
+nameParser = do
+  spaces
+  name <- string "name"
+  spaces
+  char ':'
+  spaces
+  val  <- many1 letter
+  spaces
+  return $ Item (name, val)
+
+
+
+
+
+
+
+main = putStrLn "Hello World"
+-- ----------------------------------------------------------------------------
+
 testLibRefParser = do
   let  lref = parse libRefParser "Libref" "org.apache.felix:org.apache.felix.bundlerepository:2.0.6"
   case lref of 
@@ -172,6 +228,8 @@ errHandler e = putStrLn $ "ERROR! " ++ (show e)
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
 
+
+
 runProject :: IO ()
 runProject = do
 -- main = do
@@ -188,7 +246,18 @@ runProject = do
   let p = parse projectParser "Parsing project" pr
   case p of
     Left msg -> putStrLn $ show  msg
-    Right pr -> do depRetriever $ deps pr
+    Right pr -> do 
+      print pr
+
+
+      -- depRetriever $ deps pr
 
 libsMain :: IO ()
 libsMain = runProject `catchIOError` errHandler
+
+
+ --    clean , clean <module> , compile, compile <module> , build, build <module.
+ -- javac_path : * /bin/...
+ --       uber_jar {
+ --        jar_name : *
+ --        include_module : * mod1, mod2

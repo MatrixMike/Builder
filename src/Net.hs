@@ -25,7 +25,7 @@ downLoad n u = do
                                               putStrLn "-------" 
                                               putStrLn ""
         Left (StatusCodeException s _ _) -> do putStrLn $ (show s) ++ " " ++ u
-        Left (e) -> do putStrLn $ show e
+        Left _ -> do putStrLn ""
         Right res -> do 
             case (res ^. responseStatus ^. statusCode) of
                 200 -> do 
