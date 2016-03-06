@@ -29,7 +29,7 @@ project{
       module{
          deps{}
 		    
-         
+         name       : aa
          srcPath   : bb
          classPath : cc
          destPath  : dd
