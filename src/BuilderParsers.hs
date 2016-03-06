@@ -30,7 +30,10 @@ buildToken :: String
 buildToken = "build"
 deployToken :: String
 deployToken = "deploy"
-
+itemValue :: Parser String
+itemValue = do
+   many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/' )
+   
 letterDigUndrDot :: Parser String
 letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
@@ -38,10 +41,7 @@ letterDigUndrDot = do
 
 projectParser :: Parser Project
 projectParser = do
-  spaces
-  string projectToken
-  char openBrace
-  spaces
+  spaces >> string projectToken >> char openBrace >> spaces
 
   env    <- envParser
   build  <- buildParser
@@ -112,7 +112,7 @@ itemParser = do
   spaces
   char ':'
   spaces
-  val  <- many1 letter
+  val  <- itemValue
   spaces
   return $ Item (name, val)
 -- ----------------------------------------------------------------------------

@@ -17,19 +17,19 @@ project{
 		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
 		    }
 
-         name       : aa
-         srcPath   : bb
+         name      : aa
+         srcPath   : bb/dd/dd
 
-         classPath : cc
+         classPath : c
          destPath  : dd
          jarName   : ee
-         main      : ff
+         main      : bb/dd/dd/
       }
 
       module{
          deps{}
 		    
-         name       : aa
+         name      : aa
          srcPath   : bb
          classPath : cc
          destPath  : dd
