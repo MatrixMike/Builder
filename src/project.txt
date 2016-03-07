@@ -37,8 +37,8 @@ project{
          name      : aa
          srcPath   : bb/dd/dd
 
-         classPath : c
-         destPath  : dd
+         classPath : b/dd/dd
+         destPath  : b/dd/dd
          jarName   : ee
          main      : bb/dd/dd/
       }

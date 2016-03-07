@@ -44,30 +44,38 @@ errHandler e = putStrLn $ "ERROR! " ++ (show e)
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
 
-runProject :: IO ()
-runProject = do
-  pr <- readFile "project.txt" 
+runProject :: String -> IO ()
+runProject fn = do
+  pr <- readFile fn
   let p = parse projectParser "Parsing project" pr
   case p of
     Left msg -> putStrLn $ show  msg
     Right pr -> do 
       print pr
 
+-- runProject' :: [String] -> IO ()
+
 libsMain :: IO ()
-libsMain = runProject `catchIOError` errHandler
+libsMain = (runProject "project.txt" ) `catchIOError` errHandler
 
 dispatch :: [(String, [String] -> IO ())]  
 dispatch =  [ ("clean",   cleanProj)  
             , ("list" ,   listProj)  
             , ("compile", compileProj)
             , ("build",   buildProj)  
+            , ("parse",   parseProj)
             ]
-cleanProj args = do putStrLn "clean"
-listProj  []   = do putStrLn "list"
-listProj  args = do (putStrLn "list with " )
+cleanProj args   = do putStrLn "clean"
+listProj  []     = do putStrLn "list"
+listProj  args   = do (putStrLn "list with " )
 
 buildProj   args = do putStrLn "build"
 compileProj args = do putStrLn "compile"
+
+parseProj []     = do runProject "project.txt"
+parseProj   args = do 
+  mapM_ runProject args
+
 
 readArgs = do
     args <- getArgs
