@@ -159,7 +159,6 @@ testManyLibRefParser = do
   case lref of 
     Left err  ->  show err
     Right val ->  show val
--- ---------
 -------------------------------------------------------------------
 testDepsParser text = do 
   let lref = parse depsParser "LibRef" text
