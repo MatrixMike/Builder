@@ -4,11 +4,11 @@
 module BuilderTypes where
 
 
-
-type Env = String
-type Deps = [LibRef]
-type Name = String
-type Value = String
+data Command = CleanC (Maybe String) |  CompileC | BuildC 
+type Env    = String
+type Deps   = [LibRef]
+type Name   = String
+type Value  = String
 type Deploy = String
 
 data LibRef  = LibRef  {grp :: String, artifact :: String, version :: String} deriving (Show)

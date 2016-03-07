@@ -12,8 +12,8 @@ import Network.HTTP.Client
 import Text.ParserCombinators.Parsec
 import BuilderParsers
 import BuilderTypes
-
-
+import System.Console.GetOpt
+import System.Environment
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
 
@@ -22,11 +22,6 @@ fName :: LibRef -> String
 fName l = (artifact l) ++ "-" ++ (version l) ++ ".jar"
 -- ----------------------------------------------------------------------------
 
-
-main = putStrLn "Hello World"
--- ----------------------------------------------------------------------------
-
--- data LibRef = LibRef {grp :: String, artifact :: String, version :: String} deriving (Show)
 makeURL :: LibRef -> String
 makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l) 
      where dotSlash s = map (\c -> if c == '.' then '/' else c) s  
@@ -49,20 +44,8 @@ errHandler e = putStrLn $ "ERROR! " ++ (show e)
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
 
-
-
 runProject :: IO ()
 runProject = do
--- main = do
-  -- d <- readFile "deps.txt" 
-  -- let parsedDeps = parse depsParser "Parsing deps" d
-
-  -- putStrLn $ show parsedDeps
-  -- case parsedDeps of 
-  --   Left msg -> putStrLn $ show  msg
-  --   Right v  -> depRetriever v
-
--- main = do
   pr <- readFile "project.txt" 
   let p = parse projectParser "Parsing project" pr
   case p of
@@ -70,15 +53,34 @@ runProject = do
     Right pr -> do 
       print pr
 
-
-      -- depRetriever $ deps pr
-
 libsMain :: IO ()
 libsMain = runProject `catchIOError` errHandler
 
+dispatch :: [(String, [String] -> IO ())]  
+dispatch =  [ ("clean",   cleanProj)  
+            , ("list" ,   listProj)  
+            , ("compile", compileProj)
+            , ("build",   buildProj)  
+            ]
+cleanProj args = do putStrLn "clean"
+listProj  []   = do putStrLn "list"
+listProj  args = do (putStrLn "list with " )
 
- --    clean , clean <module> , compile, compile <module> , build, build <module.
+buildProj   args = do putStrLn "build"
+compileProj args = do putStrLn "compile"
+
+readArgs = do
+    args <- getArgs
+    (command:args) <- getArgs  
+    let res = lookup command dispatch  
+    case res of
+       Just action -> action args
+       Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
+
+   
+
  -- javac_path : * /bin/...
  --       uber_jar {
  --        jar_name : *
  --        include_module : * mod1, mod2
+ 
