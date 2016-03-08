@@ -2,9 +2,9 @@
 {-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module BuilderTypes where
+import Control.Lens
+import Control.Exception
 
-
-data Command = CleanC (Maybe String) |  CompileC | BuildC 
 type Env    = String
 type Deps   = [LibRef]
 type Name   = String
@@ -23,3 +23,10 @@ itemByName nm (x:xs)
  | nm == n = Just x
  | otherwise = itemByName nm xs 
  where Item (n, _) = x
+
+moduleNames :: Project -> [Item]
+moduleNames p = res where
+	Build mods =  build p
+	itms = concat [ items m | m <- mods ]
+	res = filter f itms where  f (Item (name, _)) = name == "name"
+	
