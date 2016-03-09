@@ -44,26 +44,28 @@ errHandler e = putStrLn $ "ERROR! " ++ (show e)
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
 
-runProject :: String -> IO ()
-runProject fn = do
+parseProjectFile :: String -> IO (Maybe Project)
+parseProjectFile fn = do
   pr <- readFile fn
   let p = parse projectParser "Parsing project" pr
   case p of
-    Left msg -> putStrLn $ show  msg
-    Right pr -> do 
-      print pr
+    Left msg -> do 
+      putStrLn (show msg)
+      return Nothing
+    Right pr -> return $ Just pr
+      
 
--- runProject' :: [String] -> IO ()
+-- parseProjectFile' :: [String] -> IO ()
 
-libsMain :: IO ()
-libsMain = (runProject "project.txt" ) `catchIOError` errHandler
+-- libsMain :: IO ()
+-- libsMain = (parseProjectFile "project.txt" ) `catchIOError` errHandler
 
 dispatch :: [(String, [String] -> IO ())]  
 dispatch =  [ ("clean",   cleanProj)  
             , ("list" ,   listProj)  
             , ("compile", compileProj)
             , ("build",   buildProj)  
-            , ("parse",   parseProj)
+           -- , ("parse",   parseProj)
             ]
 cleanProj args   = do putStrLn "clean"
 listProj  []     = do putStrLn "list"
@@ -72,15 +74,23 @@ listProj  args   = do (putStrLn "list with " )
 buildProj   args = do putStrLn "build"
 compileProj args = do putStrLn "compile"
 
-parseProj []     = do runProject "project.txt"
-parseProj   args = do 
-  mapM_ runProject args
+parseProj        = do parseProjectFile "project.txt"
+
+rmvExtSpaces :: String -> String
+rmvExtSpaces = unwords . words 
+
+x :: IO ()
+x  = do
+  proj <- parseProj
+  case proj of
+    Just p -> print (moduleNames p)
+    Nothing -> print "Please correct." 
 
 
 readArgs = do
     args <- getArgs
     (command:args) <- getArgs  
-    let res = lookup command dispatch  
+    let res = lookup (rmvExtSpaces command) dispatch  
     case res of
        Just action -> action args
        Nothing     -> do putStrLn ("Error - unknown argument " ++ command)

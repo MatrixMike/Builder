@@ -2,8 +2,7 @@
 {-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module BuilderTypes where
-import Control.Lens
-import Control.Exception
+
 
 type Env    = String
 type Deps   = [LibRef]
@@ -24,9 +23,10 @@ itemByName nm (x:xs)
  | otherwise = itemByName nm xs 
  where Item (n, _) = x
 
-moduleNames :: Project -> [Item]
+moduleNames :: Project -> [Name]
 moduleNames p = res where
-	Build mods =  build p
-	itms = concat [ items m | m <- mods ]
-	res = filter f itms where  f (Item (name, _)) = name == "name"
-	
+    Build mods =  build p
+    itms = concat [ items m | m <- mods ]
+    x = filter  f itms where  f (Item (name, _)) = name == "name"
+    res = [ v | Item (_, v) <- x]
+
