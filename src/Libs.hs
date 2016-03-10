@@ -61,20 +61,37 @@ parseProjectFile fn = do
 -- libsMain = (parseProjectFile "project.txt" ) `catchIOError` errHandler
 
 dispatch :: [(String, [String] -> IO ())]  
-dispatch =  [ ("clean",   cleanProj)  
-            , ("list" ,   listProj)  
-            , ("compile", compileProj)
-            , ("build",   buildProj)  
+dispatch =  [ ("clean",   clean)  
+            , ("compile", compile)
+            , ("build",   build)  
            -- , ("parse",   parseProj)
             ]
-cleanProj args   = do putStrLn "clean"
-listProj  []     = do putStrLn "list"
-listProj  args   = do (putStrLn "list with " )
+clean args   =  putStrLn "clean"
 
-buildProj   args = do putStrLn "build"
-compileProj args = do putStrLn "compile"
 
-parseProj        = do parseProjectFile "project.txt"
+build  [] = putStrLn "build"
+build (n:ns) =  putStrLn "build ns"
+
+-- compile | compile <module-name>
+compile [] = do
+  proj <- parseProj
+  case proj of
+    Just p -> compile (moduleNames p)
+    Nothing -> print "Please correct." 
+
+compile ns = mapM_ compile' ns
+
+compile' n = do
+  proj <- parseProjectFile "project.txt"
+  case proj of
+    Nothing ->  putStrLn "error"
+    Just p  ->  
+        if isModule n p then compileModule n
+          else putStrLn "oops"
+
+compileModule m = 
+  putStrLn ("compiling module " ++ (show m))
+parseProj        =  parseProjectFile "project.txt"
 
 rmvExtSpaces :: String -> String
 rmvExtSpaces = unwords . words 
@@ -95,7 +112,7 @@ readArgs = do
        Just action -> action args
        Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
 
-   
+ -- ghc -o blldr Main.hs   
 
  -- javac_path : * /bin/...
  --       uber_jar {
