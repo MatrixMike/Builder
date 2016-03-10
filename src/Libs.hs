@@ -60,37 +60,27 @@ parseProjectFile fn = do
 -- libsMain :: IO ()
 -- libsMain = (parseProjectFile "project.txt" ) `catchIOError` errHandler
 
-dispatch :: [(String, [String] -> IO ())]  
-dispatch =  [ ("clean",   clean)  
-            , ("compile", compile)
-            , ("build",   build)  
-           -- , ("parse",   parseProj)
-            ]
-clean args   =  putStrLn "clean"
+dispatch :: [(String, [String] -> Project -> IO ())]  
+dispatch =  [("clean"  , clean  ),  
+             ("compile", compile),
+             ("build"  , build  )]
 
+clean args proj =  putStrLn "clean"
 
-build  [] = putStrLn "build"
-build (n:ns) =  putStrLn "build ns"
+build [] proj = putStrLn "build"
+build ns proj = putStrLn "build ns"
 
 -- compile | compile <module-name>
-compile [] = do
-  proj <- parseProj
-  case proj of
-    Just p -> compile (moduleNames p)
-    Nothing -> print "Please correct." 
+compile [] proj = compile (moduleNames proj) proj
+compile ns proj = mapM_ (\n -> compile' n proj) ns
 
-compile ns = mapM_ compile' ns
+compile' n proj = if isModule n proj 
+                   then compileModule n
+                  else putStrLn "oops"
 
-compile' n = do
-  proj <- parseProjectFile "project.txt"
-  case proj of
-    Nothing ->  putStrLn "error"
-    Just p  ->  
-        if isModule n p then compileModule n
-          else putStrLn "oops"
+compileModule m = putStrLn ("compiling module " ++ (show m))
+-- -----------------------------------------------------------
 
-compileModule m = 
-  putStrLn ("compiling module " ++ (show m))
 parseProj        =  parseProjectFile "project.txt"
 
 rmvExtSpaces :: String -> String
@@ -106,11 +96,15 @@ x  = do
 
 readArgs = do
     args <- getArgs
-    (command:args) <- getArgs  
-    let res = lookup (rmvExtSpaces command) dispatch  
-    case res of
-       Just action -> action args
-       Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
+    proj <- parseProjectFile "project.txt"
+    case proj of 
+      Nothing ->  putStrLn "error"
+      Just p  ->  do
+        (command:args) <- getArgs  
+        let res = lookup (rmvExtSpaces command) dispatch  
+        case res of
+           Just action -> action args p
+           Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
 
  -- ghc -o blldr Main.hs   
 
