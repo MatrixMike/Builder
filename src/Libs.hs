@@ -1,6 +1,6 @@
 
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind #-}
+{-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind#-}
 
 module Libs where
 import Data.Char
@@ -14,6 +14,7 @@ import BuilderParsers
 import BuilderTypes
 import System.Console.GetOpt
 import System.Environment
+
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
 
@@ -60,39 +61,38 @@ parseProjectFile fn = do
 dispatch :: [(String, [String] -> Project -> IO ())]  
 dispatch =  [("clean"  , clean  ),  
              ("compile", compile),
-             ("build"  , build  )]
+             ("build"  , build  ),
+             ("list"   , list   )]
+
+-- list | list <module-name>
+list [] proj = list (moduleNames proj) proj
+list ns proj = mapM_ (\n -> list' n proj) ns
+list' n proj = if isModule n proj then listModule n else putStrLn $ "Unknown module " ++ (show n)
+listModule m = putStrLn ("listing  module " ++ (show m))
 
 -- clean | clean <module-name>
 clean [] proj = clean (moduleNames proj) proj
 clean ns proj = mapM_ (\n -> clean' n proj) ns
-clean' n proj = if isModule n proj then cleanModule n else putStrLn "Unknown module"
+clean' n proj = if isModule n proj then cleanModule n else putStrLn $ "Unknown module " ++ (show n)
 cleanModule m = putStrLn ("cleanimg  module " ++ (show m))
 
 -- build | build <module-name>
 build [] proj = build (moduleNames proj) proj
 build ns proj = mapM_ (\n -> build' n proj) ns
-build' n proj = if isModule n proj then buildModule n else putStrLn "Unknown module"
+build' n proj = if isModule n proj then buildModule n else putStrLn $ "Unknown module " ++ (show n)
 buildModule m = putStrLn ("building  module " ++ (show m))
 
 -- compile | compile <module-name>
 compile [] proj = compile (moduleNames proj) proj
 compile ns proj = mapM_ (\n -> compile' n proj) ns
-compile' n proj = if isModule n proj then compileModule n  else putStrLn "Unknown module"
+compile' n proj = if isModule n proj then compileModule n  else putStrLn $ "Unknown module " ++ (show n)
 compileModule m = putStrLn ("compiling module " ++ (show m))
 -- -----------------------------------------------------------
 
 parseProj =  parseProjectFile "project.txt"
 
 rmvExtSpaces :: String -> String
-rmvExtSpaces = unwords . words 
-
-x :: IO ()
-x  = do
-  proj <- parseProj
-  case proj of
-    Just p -> print (moduleNames p)
-    Nothing -> print "Please correct." 
-
+rmvExtSpaces = unwords . words
 
 readArgs = do
     proj <- parseProjectFile "project.txt"

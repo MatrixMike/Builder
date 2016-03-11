@@ -17,6 +17,7 @@ project{
 		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
 		    }
 
+
          name      : moduleA
          srcPath   : bb/dd/dd
 
@@ -51,7 +52,7 @@ project{
 		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
 		    }
 
-         name      : moduleC
+         name      : moduleD
          srcPath   : bb/dd/dd
 
          classPath : c
