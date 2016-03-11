@@ -20,10 +20,9 @@ project{
 
          name      : moduleA
          srcPath   : bb/dd/dd
-
-         classPath : c
+         
          destPath  : dd
-         jarName   : ee
+         
          main      : bb/dd/dd/
       }
      module{
@@ -36,12 +35,7 @@ project{
 		    }
 
          name      : moduleB
-         srcPath   : bb/dd/dd
-
-         classPath : b/dd/dd
-         destPath  : b/dd/dd
-         jarName   : ee
-         main      : bb/dd/dd/
+        
       }
      module{
          deps{
@@ -54,7 +48,6 @@ project{
 
          name      : moduleD
          srcPath   : bb/dd/dd
-
          classPath : c
          destPath  : dd
          jarName   : ee

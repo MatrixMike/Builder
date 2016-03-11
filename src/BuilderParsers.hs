@@ -30,6 +30,7 @@ buildToken :: String
 buildToken = "build"
 deployToken :: String
 deployToken = "deploy"
+
 itemValue :: Parser String
 itemValue = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/' )
@@ -139,25 +140,46 @@ moduleParser = do
   spaces
   deps' <-   depsParser
   spaces
-  name'  <- nameParser
-  items' <- many1 itemParser
+  name'  <- kwip "name"
+  spaces
+  -- This is not very nice...
+  x1 <-  many $ kwip "srcPath" 
+  spaces
+  x2 <-  many $ kwip "classPath"
+  spaces
+  x3 <-  many $ kwip "destPath"
+  spaces
+  x4 <-  many $ kwip "jarName"
+  spaces
+  x5 <-  many $ kwip "main"
   spaces
   char '}'
   spaces
-  return $ Module (name' : items') deps'
+  return $ Module ([name'] ++ x1 ++  x2 ++  x3 ++  x4 ++  x5) deps'
+
+      -- srcPath   : bb/dd/dd
+
+      --    classPath : b/dd/dd
+      --    destPath  : b/dd/dd
+      --    jarName   : ee
+      --    main      : bb/dd/dd/
+kwiParsers :: [Parser Item]  
+kwiParsers = [kwip "srcPath", kwip "classPath", kwip "destPath", kwip "jarName", kwip "main"] 
+
+   
 -- ----------------------------------------------------------------------------
-nameParser :: Parser Item
-nameParser = do
+kwip :: String -> Parser Item
+kwip keyWord = do
   spaces
-  name <- string "name"
+  name <- string keyWord
   spaces
   char ':'
   spaces
-  val  <- many1 letter
+  val  <-  itemValue
   spaces
   return $ Item (name, val)
 
--- ----------------------------------------------------------------------------
+
 
 int :: (Integral a, Read a) => Parser a
 int =  fmap read  (many1 digit)
