@@ -54,9 +54,6 @@ parseProjectFile fn = do
       return Nothing
     Right pr -> return $ Just pr
       
-
--- parseProjectFile' :: [String] -> IO ()
-
 -- libsMain :: IO ()
 -- libsMain = (parseProjectFile "project.txt" ) `catchIOError` errHandler
 
@@ -65,23 +62,26 @@ dispatch =  [("clean"  , clean  ),
              ("compile", compile),
              ("build"  , build  )]
 
-clean args proj =  putStrLn "clean"
+-- clean | clean <module-name>
+clean [] proj = clean (moduleNames proj) proj
+clean ns proj = mapM_ (\n -> clean' n proj) ns
+clean' n proj = if isModule n proj then cleanModule n else putStrLn "Unknown module"
+cleanModule m = putStrLn ("cleanimg  module " ++ (show m))
 
-build [] proj = putStrLn "build"
-build ns proj = putStrLn "build ns"
+-- build | build <module-name>
+build [] proj = build (moduleNames proj) proj
+build ns proj = mapM_ (\n -> build' n proj) ns
+build' n proj = if isModule n proj then buildModule n else putStrLn "Unknown module"
+buildModule m = putStrLn ("building  module " ++ (show m))
 
 -- compile | compile <module-name>
 compile [] proj = compile (moduleNames proj) proj
 compile ns proj = mapM_ (\n -> compile' n proj) ns
-
-compile' n proj = if isModule n proj 
-                   then compileModule n
-                  else putStrLn "oops"
-
+compile' n proj = if isModule n proj then compileModule n  else putStrLn "Unknown module"
 compileModule m = putStrLn ("compiling module " ++ (show m))
 -- -----------------------------------------------------------
 
-parseProj        =  parseProjectFile "project.txt"
+parseProj =  parseProjectFile "project.txt"
 
 rmvExtSpaces :: String -> String
 rmvExtSpaces = unwords . words 
@@ -95,8 +95,8 @@ x  = do
 
 
 readArgs = do
-    args <- getArgs
     proj <- parseProjectFile "project.txt"
+    args <- getArgs   
     case proj of 
       Nothing ->  putStrLn "error"
       Just p  ->  do
