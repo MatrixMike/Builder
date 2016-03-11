@@ -37,20 +37,34 @@ itemValue = do
 letterDigUndrDot :: Parser String
 letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
+
+-- ----------------------------------------------------------------------------
+parseProj :: IO (Maybe Project)
+parseProj =  parseProjectFile "project.txt"
+parseProjectFile :: String -> IO (Maybe Project)
+parseProjectFile fn = do
+  prj <- readFile fn
+  let p = parse projectParser "Parsing project" prj
+  case p of
+    Left msg -> do 
+      putStrLn (show msg)
+      return Nothing
+    Right pr -> return $ Just pr
+
 -- ----------------------------------------------------------------------------
 
 projectParser :: Parser Project
 projectParser = do
   spaces >> string projectToken >> char openBrace >> spaces
 
-  env    <- envParser
-  build  <- buildParser
-  deploy <- deployParser
+  envSection    <- envParser
+  buildSection  <- buildParser
+  deploySection <- deployParser
 
   spaces
   char closeBrace
 
-  return $ Project env  build deploy
+  return $ Project envSection  buildSection deploySection
 -- ----------------------------------------------------------------------------
 envParser :: Parser Env
 envParser = do
@@ -95,13 +109,13 @@ deployParser = do
 libRefParser :: Parser LibRef
 libRefParser = do
   spaces
-  grp <- letterDigUndrDot
+  group' <- letterDigUndrDot
   char sep
-  art <- letterDigUndrDot
+  artifact' <- letterDigUndrDot
   char sep
-  ver <- letterDigUndrDot
+  version' <- letterDigUndrDot
   spaces
-  return $ LibRef grp art ver
+  return $ LibRef group' artifact' version'
 -- ----------------------------------------------------------------------------
 -- data Item = (Name, Value)
 -- data Module = Module [Item]
@@ -123,14 +137,14 @@ moduleParser = do
   spaces
   char '{'
   spaces
-  deps <-   depsParser
+  deps' <-   depsParser
   spaces
-  name  <- nameParser
-  items <- many1 itemParser
+  name'  <- nameParser
+  items' <- many1 itemParser
   spaces
   char '}'
   spaces
-  return $ Module (name : items) deps
+  return $ Module (name' : items') deps'
 -- ----------------------------------------------------------------------------
 nameParser :: Parser Item
 nameParser = do
@@ -148,18 +162,21 @@ nameParser = do
 int :: (Integral a, Read a) => Parser a
 int =  fmap read  (many1 digit)
 -- ----------------------------------------------------------------------------
+testLibRefParser :: String
 testLibRefParser = do
   let  lref = parse libRefParser "Libref" "org.apache.felix:org.apache.felix.bundlerepository:2.0.6"
   case lref of 
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
+testManyLibRefParser :: String
 testManyLibRefParser = do
   let  lref = parse (many libRefParser) "Libref" ""
   case lref of 
     Left err  ->  show err
     Right val ->  show val
 -------------------------------------------------------------------
+testDepsParser :: String -> String
 testDepsParser text = do 
   let lref = parse depsParser "LibRef" text
   case lref of 
