@@ -43,7 +43,7 @@ validateProject :: Either String Project -> Either String Project
 validateProject p' = 
  case p' of 
   Left msg ->  Left msg
-  Right  p ->  checker p >>= checker' >>=  checker'' >>= noDupModules
+  Right  p ->  checker p >>= checker' >>=  noDupOptionals >>= noDupModules
 
 checker :: Project -> Either String Project 
 checker p = Right p 
@@ -63,11 +63,13 @@ noDupModules p
     diff = x \\ nub x 
     x = moduleNames p   
 -- ----------------------------------------------------------------------------
--- noDupOptionals :: Project -> Either String Project
--- noDupOptionals p  = do 
---   let mods =  buil p
---   -- check each m in turn 
---   map (\x -> noDupOptionals')  mods
+noDupOptionals :: Project -> Either String Project
+noDupOptionals p  = do 
+  let (Build mods) =  buil p
+  case (mapM noDupOptionals' mods) of 
+    Left  m -> Left m
+    Right _ -> Right p
+
 
 
 

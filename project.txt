@@ -58,6 +58,7 @@ project{
          deps{}
 		    
          name      : moduleD
+         srcPath   : dd
          srcPath   : bb
          classPath : cc
          destPath  : dd
