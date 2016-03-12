@@ -59,7 +59,6 @@ project{
 		    
          name      : moduleD
          srcPath   : dd
-         srcPath   : bb
          classPath : cc
          destPath  : dd
          jarName   : ee
@@ -75,6 +74,8 @@ project{
          srcPath   : bb
          classPath : cc
          destPath  : dd
+         destPath  : dd
+
          jarName   : ee
          main      : ff
 

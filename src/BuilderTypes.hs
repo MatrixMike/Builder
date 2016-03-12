@@ -24,6 +24,14 @@ itemByName nm (x:xs)
  | otherwise = itemByName nm xs 
  where Item (n, _) = x
 -- ------------------------------------------------------
+moduleName :: Module -> Value
+moduleName m =
+    case itemByName "name" (items m) of
+        Just (Item (_,  v)) -> v
+        Nothing -> "Module has no name!!"::Value
+    
+-- ------------------------------------------------------
+
 itemNames :: Module -> [Name]
 itemNames m = [ n | Item (n, _) <- items m]
 

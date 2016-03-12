@@ -77,7 +77,7 @@ noDupOptionals p  = do
 noDupOptionals' :: Module -> Either String Module
 noDupOptionals' m
    | x \\ nub x == [] = Right m
-   | otherwise = Left ( show  m ++  " has duplicate optional  names  " ++ (show diff))
+   | otherwise = Left ( show  (moduleName m) ++  " has duplicate optional  names  " ++ (show diff))
    where
     diff = x \\ nub x
     x = itemNames m
