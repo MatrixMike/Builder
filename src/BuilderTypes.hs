@@ -23,6 +23,9 @@ itemByName nm (x:xs)
  | nm == n = Just x
  | otherwise = itemByName nm xs 
  where Item (n, _) = x
+-- ------------------------------------------------------
+itemNames :: Module -> [Name]
+itemNames m = [ n | Item (n, _) <- items m]
 
 -- Is the supplied name the name of a module
 isModule :: Name -> Project -> Bool

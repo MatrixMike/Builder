@@ -91,20 +91,15 @@ rmvExtSpaces = unwords . words
 
 readArgs :: IO ()
 readArgs = do
-    proj <- parseProjectFile "project.txt"
-
-    case proj of 
-      Nothing ->  putStrLn "error"
-      Just p  ->  do
-        putStrLn (show p)
-        --  Maybe consider validating the project - especially in the 
-        -- use of optionals like main, srcPath, classPath etc. Make sure theres only at most one 
-        --
-        (command:args) <- getArgs  
-        let res = lookup (rmvExtSpaces command) dispatch  
-        case res of
-           Just action -> action args p
-           Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
+    proj <-  parseProjectFile "project.txt"
+    case validateProject (proj) of
+          Left msg -> putStrLn msg
+          Right pr -> do
+              (command:args) <- getArgs  
+              let res = lookup (rmvExtSpaces command) dispatch  
+              case res of
+                Just action -> action args pr
+                Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
 
  -- ghc -o blldr Main.hs   
 

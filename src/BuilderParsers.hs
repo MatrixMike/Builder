@@ -4,7 +4,7 @@ module BuilderParsers where
 
 import Text.ParserCombinators.Parsec
 import BuilderTypes
-
+import Data.List
 
 sep :: Char
 sep = ':'
@@ -39,19 +39,60 @@ letterDigUndrDot :: Parser String
 letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 
+validateProject :: Either String Project -> Either String Project
+validateProject p' = 
+ case p' of 
+  Left msg ->  Left msg
+  Right  p ->  checker p >>= checker' >>=  checker'' >>= noDupModules
+
+checker :: Project -> Either String Project 
+checker p = Right p 
+
+checker' :: Project -> Either String Project 
+checker' p = Right p 
+
+checker'' :: Project -> Either String Project 
+checker'' p = Right p 
+
 -- ----------------------------------------------------------------------------
-parseProj :: IO (Maybe Project)
+noDupModules :: Project -> Either String Project 
+noDupModules p 
+  | x \\ nub x == [] = Right p
+  | otherwise = Left ( "Duplicate module names: " ++ (show diff))
+  where
+    diff = x \\ nub x 
+    x = moduleNames p   
+-- ----------------------------------------------------------------------------
+-- noDupOptionals :: Project -> Either String Project
+-- noDupOptionals p  = do 
+--   let mods =  buil p
+--   -- check each m in turn 
+--   map (\x -> noDupOptionals')  mods
+
+
+
+-- for each module check for dups in the Items
+noDupOptionals' :: Module -> Either String Module
+noDupOptionals' m
+   | x \\ nub x == [] = Right m
+   | otherwise = Left ( show  m ++  " has duplicate optional  names  " ++ (show diff))
+   where
+    diff = x \\ nub x
+    x = itemNames m
+
+
+parseProj :: IO (Either String Project)
 parseProj =  parseProjectFile "project.txt"
-parseProjectFile :: String -> IO (Maybe Project)
+
+parseProjectFile :: String -> IO (Either String Project)
 parseProjectFile fn = do
   prj <- readFile fn
   let p = parse projectParser "Parsing project" prj
   case p of
     Left msg -> do 
       putStrLn (show msg)
-      return Nothing
-    Right pr -> return $ Just pr
-
+      return (Left $ show msg)
+    Right pr -> return $ Right pr
 -- ----------------------------------------------------------------------------
 
 projectParser :: Parser Project

@@ -46,7 +46,7 @@ project{
 		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
 		    }
 
-         name      : moduleD
+         name      : moduleC
          srcPath   : bb/dd/dd
          classPath : c
          destPath  : dd
@@ -58,6 +58,19 @@ project{
          deps{}
 		    
          name      : moduleD
+         srcPath   : bb
+         classPath : cc
+         destPath  : dd
+         jarName   : ee
+         main      : ff
+
+
+       }
+
+             module{
+         deps{}
+            
+         name      : moduleE
          srcPath   : bb
          classPath : cc
          destPath  : dd
