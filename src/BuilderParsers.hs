@@ -8,24 +8,16 @@ import Data.List
 
 sep :: Char
 sep = ':'
-
 openBrace :: Char
 openBrace = '{'
-
 closeBrace :: Char
 closeBrace = '}'
-
 projectToken :: String
 projectToken = "project"
-
 envToken :: String
 envToken = "env"
-
-
 depsToken :: String
 depsToken = "deps"
-
-
 buildToken :: String
 buildToken = "build"
 deployToken :: String
@@ -40,20 +32,16 @@ letterDigUndrDot = do
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 
 validateProject :: Either String Project -> Either String Project
-validateProject p' = 
- case p' of 
+validateProject p = 
+ case p of 
   Left msg ->  Left msg
-  Right  p ->  checker p >>= checker' >>=  noDupOptionals >>= noDupModules
+  Right  p' ->  checker p' >>= checker' >>=  noDupOptionals >>= noDupModules
 
 checker :: Project -> Either String Project 
 checker p = Right p 
 
 checker' :: Project -> Either String Project 
 checker' p = Right p 
-
-checker'' :: Project -> Either String Project 
-checker'' p = Right p 
-
 -- ----------------------------------------------------------------------------
 noDupModules :: Project -> Either String Project 
 noDupModules p 
@@ -70,17 +58,15 @@ noDupOptionals p  = do
     Left  m -> Left m
     Right _ -> Right p
 
-
-
-
 -- for each module check for dups in the Items
 noDupOptionals' :: Module -> Either String Module
 noDupOptionals' m
    | x \\ nub x == [] = Right m
-   | otherwise = Left ( show  (moduleName m) ++  " has duplicate optional  names  " ++ (show diff))
+   | otherwise = Left ( show  (moduleName m) ++  " has duplicate optional names. " ++ (show diff))
    where
     diff = x \\ nub x
     x = itemNames m
+-- ----------------------------------------------------------------------------
 
 
 parseProj :: IO (Either String Project)
