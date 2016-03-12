@@ -18,18 +18,17 @@ fName l = (artifact l) ++ "-" ++ (version l) ++ ".jar"
 
 makeURL :: LibRef -> String
 makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l) 
-     where dotSlash s = map (\c -> if c == '.' then '/' else c) s  
+     where dotSlash  = map (\c -> if c == '.' then '/' else c)   
       
 -- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
 downLoad' l = do 
-  putStrLn $ show l
+  print l
   downLoad (fName l) (makeURL l)
 -- ----------------------------------------------------------------------------
 
 depRetriever :: [LibRef] -> IO ()
-depRetriever depends = 
-    mapM_ downLoad'  depends
+depRetriever  = mapM_ downLoad'  
 -- ----------------------------------------------------------------------------
 
 errHandler :: IOError -> IO ()  
@@ -92,14 +91,14 @@ rmvExtSpaces = unwords . words
 readArgs :: IO ()
 readArgs = do
     proj <-  parseProjectFile "project.txt"
-    case validateProject (proj) of
+    case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do
               (command:args) <- getArgs  
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of
                 Just action -> action args pr
-                Nothing     -> do putStrLn ("Error - unknown argument " ++ command)
+                Nothing     ->  putStrLn ("Error - unknown argument " ++ command)
 
  -- ghc -o blldr Main.hs   
 

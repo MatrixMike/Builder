@@ -24,11 +24,11 @@ deployToken :: String
 deployToken = "deploy"
 
 itemValue :: Parser String
-itemValue = do
-   many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/' )
+itemValue = 
+  many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/' )
    
 letterDigUndrDot :: Parser String
-letterDigUndrDot = do
+letterDigUndrDot = 
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 
 validateProject :: Either String Project -> Either String Project
@@ -38,10 +38,10 @@ validateProject p =
   Right  p' ->  checker p' >>= checker' >>=  noDupOptionals >>= noDupModules
 
 checker :: Project -> Either String Project 
-checker p = Right p 
+checker  = Right  
 
 checker' :: Project -> Either String Project 
-checker' p = Right p 
+checker' = Right  
 -- ----------------------------------------------------------------------------
 noDupModules :: Project -> Either String Project 
 noDupModules p 
@@ -78,7 +78,7 @@ parseProjectFile fn = do
   let p = parse projectParser "Parsing project" prj
   case p of
     Left msg -> do 
-      putStrLn (show msg)
+      print msg
       return (Left $ show msg)
     Right pr -> return $ Right pr
 -- ----------------------------------------------------------------------------

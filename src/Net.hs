@@ -24,11 +24,11 @@ downLoad n u = do
                                               putStrLn s1
                                               putStrLn "-------" 
                                               putStrLn ""
-        Left (StatusCodeException s _ _) -> do putStrLn $ (show s) ++ " " ++ u
-        Left _ -> do putStrLn ""
-        Right res -> do 
+        Left (StatusCodeException s _ _) ->  putStrLn $ (show s) ++ " " ++ u
+        Left _ ->  putStrLn ""
+        Right res ->  
             case (res ^. responseStatus ^. statusCode) of
-                200 -> do 
+                200 ->  
                     
                     ByteString.writeFile n bin where bin = res ^. responseBody
                     
