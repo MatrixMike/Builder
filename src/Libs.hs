@@ -85,9 +85,6 @@ compileModule m = putStrLn ("compiling module " ++ (show m))
 -- -----------------------------------------------------------
 
 
-rmvExtSpaces :: String -> String
-rmvExtSpaces = unwords . words
-
 readArgs :: IO ()
 readArgs = do
     proj <-  parseProjectFile "project.txt"

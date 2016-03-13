@@ -19,8 +19,7 @@ project{
 
 
          name      : moduleA
-         srcPath   : bb/dd/dd
-         
+                  
          destPath  : dd
          
          main      : bb/dd/dd/
@@ -47,8 +46,7 @@ project{
 		    }
 
          name      : moduleD
-         srcPath   : bb/dd/dd
-         classPath : c
+         modDep    : moduleE,  moduleA,  moduleA
          destPath  : dd
          jarName   : ee
          main      : bb/dd/dd/
@@ -57,9 +55,8 @@ project{
       module{
          deps{}
 		    
-         name      : moduleD
-         srcPath   : bb
-         classPath : cc
+         name      : moduleE
+         modDep    : moduleA
          destPath  : dd
          jarName   : ee
          main      : ff

@@ -5,6 +5,7 @@ module BuilderParsers where
 import Text.ParserCombinators.Parsec
 import BuilderTypes
 import Data.List
+import Data.List.Split
 
 sep :: Char
 sep = ':'
@@ -23,9 +24,13 @@ buildToken = "build"
 deployToken :: String
 deployToken = "deploy"
 
+
+rmvExtSpaces :: String -> String
+rmvExtSpaces = unwords . words
+
 itemValue :: Parser String
 itemValue = 
-  many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/' )
+  many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/'  <|> char ',' <|> char ' '  )
    
 letterDigUndrDot :: Parser String
 letterDigUndrDot = 
@@ -35,7 +40,7 @@ validateProject :: Either String Project -> Either String Project
 validateProject p = 
  case p of 
   Left msg ->  Left msg
-  Right  p' ->  checker p' >>= checker' >>=  noDupOptionals >>= noDupModules
+  Right  p' ->  checker p' >>= checkModDeps >>=  noDupOptionals >>= noDupModules
 
 checker :: Project -> Either String Project 
 checker  = Right  
@@ -67,6 +72,24 @@ noDupOptionals' m
     diff = x \\ nub x
     x = itemNames m
 -- ----------------------------------------------------------------------------
+checkModDeps :: Project -> Either String Project
+checkModDeps p = do
+  let (Build mods) =  buil p
+  case (mapM checkModDeps' mods) of 
+    Left  m -> Left m
+    Right _ -> Right p
+
+checkModDeps' :: Module -> Either String Module
+checkModDeps' m = do
+  let modDepLst = itemByName "modDep" $ items m -- list of csv
+  case modDepLst of 
+    Nothing -> Right m -- list is empty so all ok
+    Just ls -> Right m
+
+  -- let lst = splitOn "," mod modDepLst
+  -- case lst of
+  --   [] -> Right m
+  --   l  -> Left ""
 
 
 parseProj :: IO (Either String Project)
@@ -169,34 +192,24 @@ moduleParser = do
   spaces
   deps' <-   depsParser
   spaces
-  name'  <- kwip "name"
+  name'  <-         kwip "name"
   spaces
   -- This is not very nice...
-  x1 <-  many $ kwip "srcPath" 
+  x1     <-  many $ kwip "modDep" 
   spaces
-  x2 <-  many $ kwip "classPath"
+  
+  x2     <-  many $ kwip "destPath"
   spaces
-  x3 <-  many $ kwip "destPath"
+  x3     <-  many $ kwip "jarName"
   spaces
-  x4 <-  many $ kwip "jarName"
-  spaces
-  x5 <-  many $ kwip "main"
+  x4     <-  many $ kwip "main"
   spaces
   char '}'
   spaces
-  return $ Module ([name'] ++ x1 ++  x2 ++  x3 ++  x4 ++  x5) deps'
-
-      -- srcPath   : bb/dd/dd
-
-      --    classPath : b/dd/dd
-      --    destPath  : b/dd/dd
-      --    jarName   : ee
-      --    main      : bb/dd/dd/
-kwiParsers :: [Parser Item]  
-kwiParsers = [kwip "srcPath", kwip "classPath", kwip "destPath", kwip "jarName", kwip "main"] 
-
-   
+  return $ Module ([name'] ++ x1 ++  x2 ++  x3 ++  x4) deps'
+ 
 -- ----------------------------------------------------------------------------
+-- KeyWordItemParser
 kwip :: String -> Parser Item
 kwip keyWord = do
   spaces
@@ -206,10 +219,8 @@ kwip keyWord = do
   spaces
   val  <-  itemValue
   spaces
-  return $ Item (name, val)
-
-
-
+  return $ Item (name, rmvExtSpaces val)
+-- ----------------------------------------------------------------------------
 int :: (Integral a, Read a) => Parser a
 int =  fmap read  (many1 digit)
 -- ----------------------------------------------------------------------------

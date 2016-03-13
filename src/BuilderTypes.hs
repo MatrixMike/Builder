@@ -31,6 +31,10 @@ moduleName m =
         Nothing -> "Module has no name!!"::Value
     
 -- ------------------------------------------------------
+moduleByName :: Name -> Either String Module
+moduleByName = undefined
+-- ------------------------------------------------------
+
 
 itemNames :: Module -> [Name]
 itemNames m = [ n | Item (n, _) <- items m]
