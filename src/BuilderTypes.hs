@@ -37,7 +37,14 @@ moduleName m =
         Left _ -> "Module has no name!!"::Value
 -- ------------------------------------------------------
 moduleByName :: Name -> Project -> Either String Module
-moduleByName = undefined
+moduleByName n p =
+
+    case  filter (\m -> mName m == n ) mods  of
+        [] -> Left ("No module with name: " ++ (show n))
+        (a:[]) -> Right a
+        (_:_) -> Left ("Duplicate modeules with name: " ++ (show n)) -- won't happen!
+        where 
+            Build mods =  buil p
 -- ------------------------------------------------------
 
 
