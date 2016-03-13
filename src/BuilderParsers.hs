@@ -94,23 +94,7 @@ checkModDeps' m =
       case listDups lst of
         [] -> Right m
         _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
-
-
-
-
-
-  -- case ls of 
-  --   Nothing -> Right m -- list is empty so all ok
-  --   Just ls' -> do 
-  --     let lst = splitOn "," ls'
-  --     case listDups ls' of
-  --       []   -> Right m
-  --       dps  -> Left ("Duplicate module names in " ++ (show $ moduleName m) ++ (show ls)) 
-
-  -- let lst = splitOn "," mod modDepLst
-  -- case lst of
-  --   [] -> Right m
-  --   l  -> Left ""
+-- ----------------------------------------------------------------------------
 
 
 parseProj :: IO (Either String Project)
@@ -183,11 +167,11 @@ deployParser = do
 libRefParser :: Parser LibRef
 libRefParser = do
   spaces
-  group' <- letterDigUndrDot
+  group'    <- letterDigUndrDot
   char sep
   artifact' <- letterDigUndrDot
   char sep
-  version' <- letterDigUndrDot
+  version'  <- letterDigUndrDot
   spaces
   return $ LibRef group' artifact' version'
 -- ----------------------------------------------------------------------------
@@ -211,7 +195,7 @@ moduleParser = do
   spaces
   char '{'
   spaces
-  deps' <-   depsParser
+  deps'  <-         depsParser
   spaces
   name'  <-         kwip "name"
   spaces
@@ -230,6 +214,10 @@ moduleParser = do
   return $ Module ([name'] ++ x1 ++  x2 ++  x3 ++  x4) deps'
  
 -- ----------------------------------------------------------------------------
+
+
+
+
 -- KeyWordItemParser
 kwip :: String -> Parser Item
 kwip keyWord = do

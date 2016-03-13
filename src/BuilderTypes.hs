@@ -23,13 +23,17 @@ itemByName nm (x:xs)
  | nm == n' = Right x
  | otherwise = itemByName nm xs 
  where Item (n', _) = x
+
+
+itemByNameInModule :: Module -> Name  -> Either String Item
+itemByNameInModule m n =itemByName n (items m) 
+
 -- ------------------------------------------------------
 moduleName :: Module -> Value
 moduleName m =
     case itemByName "name" (items m) of
         Right (Item (_,  v)) -> v
         Left _ -> "Module has no name!!"::Value
-    
 -- ------------------------------------------------------
 moduleByName :: Name -> Either String Module
 moduleByName = undefined
