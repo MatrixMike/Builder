@@ -17,18 +17,18 @@ data Module  = Module  {items :: [Item], deps :: Deps}  deriving (Show)
 data Project = Project {env :: Env, buil :: Build, deploy :: Deploy} deriving (Show)
 
 -- Get an item by Name from a list of Item 
-itemByName :: Name -> [Item] -> Maybe Item
-itemByName _ [] = Nothing
+itemByName :: Name -> [Item] -> Either String Item
+itemByName nm [] = Left ("No Item with name:" ++ (show nm))
 itemByName nm (x:xs)
- | nm == n = Just x
+ | nm == n' = Right x
  | otherwise = itemByName nm xs 
- where Item (n, _) = x
+ where Item (n', _) = x
 -- ------------------------------------------------------
 moduleName :: Module -> Value
 moduleName m =
     case itemByName "name" (items m) of
-        Just (Item (_,  v)) -> v
-        Nothing -> "Module has no name!!"::Value
+        Right (Item (_,  v)) -> v
+        Left _ -> "Module has no name!!"::Value
     
 -- ------------------------------------------------------
 moduleByName :: Name -> Either String Module

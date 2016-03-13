@@ -85,12 +85,13 @@ checkModDeps' :: Module -> Either String Module
 checkModDeps' m =
 
   case itemByName "modDep" $ items m  of -- ls is csv
-    Nothing             -> Right m
-    Just (Item (_, ls)) -> do
+    Left _              -> Right m
+    Right  x -> do
+      let (Item (_, ls)) = x
       let lst = splitOn "," ls
       case listDups lst of
         [] -> Right m
-        _  -> Left ("Duplicate module names in module: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
+        _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
 
 
 
