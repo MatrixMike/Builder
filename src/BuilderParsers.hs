@@ -39,11 +39,11 @@ letterDigUndrDot =
 validateProject :: Either String Project -> Either String Project
 validateProject p = 
  case p of 
-  Left msg ->  Left msg
-  Right  p' ->  checker p' >>= checkModDeps >>=  noDupOptionals >>= noDupModules
+  Left msg  ->  Left msg
+  Right  p' ->  circularModRefs p' >>= checkModDeps >>=  noDupOptionals >>= noDupModules
 
-checker :: Project -> Either String Project 
-checker  = Right  
+circularModRefs :: Project -> Either String Project 
+circularModRefs  = Right  
 
 checker' :: Project -> Either String Project 
 checker' = Right  
@@ -66,11 +66,13 @@ noDupOptionals p  = do
 -- for each module check for dups in the Items
 noDupOptionals' :: Module -> Either String Module
 noDupOptionals' m
-   | x \\ nub x == [] = Right m
+   | diff == [] = Right m
    | otherwise = Left ( show  (moduleName m) ++  " has duplicate optional names. " ++ (show diff))
    where
-    diff = x \\ nub x
-    x = itemNames m
+    diff = listDups $ itemNames m
+
+listDups :: Eq a => [a] -> [a] 
+listDups xs = xs \\ nub xs
 -- ----------------------------------------------------------------------------
 checkModDeps :: Project -> Either String Project
 checkModDeps p = do
@@ -80,11 +82,27 @@ checkModDeps p = do
     Right _ -> Right p
 
 checkModDeps' :: Module -> Either String Module
-checkModDeps' m = do
-  let modDepLst = itemByName "modDep" $ items m -- list of csv
-  case modDepLst of 
-    Nothing -> Right m -- list is empty so all ok
-    Just ls -> Right m
+checkModDeps' m =
+
+  case itemByName "modDep" $ items m  of -- ls is csv
+    Nothing             -> Right m
+    Just (Item (_, ls)) -> do
+      let lst = splitOn "," ls
+      case listDups lst of
+        [] -> Right m
+        _  -> Left ("Duplicate module names in module: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
+
+
+
+
+
+  -- case ls of 
+  --   Nothing -> Right m -- list is empty so all ok
+  --   Just ls' -> do 
+  --     let lst = splitOn "," ls'
+  --     case listDups ls' of
+  --       []   -> Right m
+  --       dps  -> Left ("Duplicate module names in " ++ (show $ moduleName m) ++ (show ls)) 
 
   -- let lst = splitOn "," mod modDepLst
   -- case lst of
