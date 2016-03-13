@@ -97,7 +97,6 @@ readArgs = do
                 Just action -> action args pr
                 Nothing     ->  putStrLn ("Error - unknown argument " ++ command)
 
- -- ghc -o blldr Main.hs   
 
  -- javac_path : * /bin/...
  --       uber_jar {

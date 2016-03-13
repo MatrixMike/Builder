@@ -21,7 +21,8 @@ project{
          name      : moduleA
                   
          destPath  : dd
-         
+         destPath  : dd
+
          main      : bb/dd/dd/
       }
      module{
@@ -46,7 +47,8 @@ project{
 		    }
 
          name      : moduleD
-         modDep    : moduleE,  moduleA,  moduleA
+         modDep    : moduleE,  moduleA
+         destPath  : dd
          destPath  : dd
          jarName   : ee
          main      : bb/dd/dd/

@@ -40,15 +40,27 @@ validateProject :: Either String Project -> Either String Project
 validateProject p = 
  case p of 
   Left msg  ->  Left msg
-  Right  p' ->  circularModRefs p' >>= checkModDeps >>=  noDupOptionals >>= noDupModules
+  Right  p' ->  checkModDeps p' >>=  noDupOptionals >>= noDupModules
 
 -- For each module look at the 'modDep' list. For each module 
 -- in that list does the module's 'modDep' list contain the module under examination?
-circularModRefs :: Project -> Either String Project 
-circularModRefs  = Right  
+-- circularModRefs :: Project -> Either String Project 
+-- circularModRefs p = do
+--   let allNames = moduleNames p
 
-checker' :: Project -> Either String Project 
-checker' = Right  
+--   case (mapM (\x -> f x )  allNames) of
+
+--     where 
+--       f x = 
+
+
+
+-- checker' :: Project -> Either String Project 
+-- checker' p = r where
+--   allNames = moduleNames p 
+--   case Ma
+
+
 -- ----------------------------------------------------------------------------
 noDupModules :: Project -> Either String Project 
 noDupModules p 
@@ -211,7 +223,9 @@ moduleParser = do
   spaces
   char '}'
   spaces
-  return $ Module ([name'] ++ x1 ++  x2 ++  x3 ++  x4) deps'
+  let Item (_, mName) = name'
+  return $ Module mName ([name'] ++ x1 ++  x2 ++  x3 ++  x4) deps' 
+
  
 -- ----------------------------------------------------------------------------
 

@@ -11,9 +11,10 @@ type Value  = String
 type Deploy = String
 
 data LibRef  = LibRef  {grp :: String, artifact :: String, version :: String} deriving (Show)
-data Build   = Build   [Module] deriving (Show)
+
 data Item    = Item    (Name, Value) deriving (Show)
-data Module  = Module  {items :: [Item], deps :: Deps}  deriving (Show)
+data Module  = Module  {mName::Name, items :: [Item], deps :: Deps}  deriving (Show)
+data Build   = Build   [Module] deriving (Show)
 data Project = Project {env :: Env, buil :: Build, deploy :: Deploy} deriving (Show)
 
 -- Get an item by Name from a list of Item 
@@ -35,7 +36,7 @@ moduleName m =
         Right (Item (_,  v)) -> v
         Left _ -> "Module has no name!!"::Value
 -- ------------------------------------------------------
-moduleByName :: Name -> Either String Module
+moduleByName :: Name -> Project -> Either String Module
 moduleByName = undefined
 -- ------------------------------------------------------
 
