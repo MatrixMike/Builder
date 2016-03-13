@@ -42,6 +42,8 @@ validateProject p =
   Left msg  ->  Left msg
   Right  p' ->  circularModRefs p' >>= checkModDeps >>=  noDupOptionals >>= noDupModules
 
+-- For each module look at the 'modDep' list. For each module 
+-- in that list does the module's 'modDep' list contain the module under examination?
 circularModRefs :: Project -> Either String Project 
 circularModRefs  = Right  
 
