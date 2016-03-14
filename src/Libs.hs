@@ -8,6 +8,7 @@ import BuilderParsers
 import BuilderTypes
 import System.Environment
 import System.Process
+import Process
 
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
@@ -83,8 +84,18 @@ compile ns proj = mapM_ (\n -> compile' n proj) ns
 compile' :: Name -> Project -> IO ()
 compile' n proj = if isModule n proj then compileModule n  else putStrLn $ "Unknown module " ++ (show n)
 compileModule m = putStrLn ("compiling module " ++ (show m))
--- -----------------------------------------------------------
 
+-- -----------------------------------------------------------
+compileJava :: Module -> IO ()
+compileJava m = compileP (options m) (srcfiles m)
+
+-- java options as in javac <options> <source files>
+options :: Module -> String
+options = undefined
+
+-- All *.java from srcRoot down in supplied module 
+srcfiles :: Module -> [FilePath]
+srcfiles = undefined
 
 readArgs :: IO ()
 readArgs = do
