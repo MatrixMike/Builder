@@ -51,7 +51,7 @@ validateProject p =
 --   case (mapM (\x -> f x )  allNames) of
 
 --     where 
---       f x = 
+--       f x =  
 
 
 
