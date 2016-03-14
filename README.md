@@ -13,8 +13,8 @@ project{
     build{
       module{
          deps{
-		cglib:cglib:3.1
-		HTTPClient:HTTPClient:0.3-3}
+		     cglib:cglib:3.1
+		     HTTPClient:HTTPClient:0.3-3}
          name      : moduleA
          destPath  : dest/aFolder
          main      : com.dummy.test.RunIt
