@@ -1,15 +1,10 @@
 # Builder
 
 An experimental build tool for Java projects.  Primarily an exercise in learning Haskell. 
-Based around parsing a project file and invoking various commandline utilities such as javac, jar etc.
+Based around parsing a project file and invoking various command line utilities such as javac, jar etc.
 The project file is divided into several sections. First is the 'env' section, content to-be-determined, but probably 
-'meta' information about the project.
-Next is the declarations in Maven co-ordinate format. The module must have a name declaration in the form of
-name:<Module name>. Thsi can then be followed by a number of optional key:value declarations. Examples being jarName, main, destPath. Fianlly at the end of 
-the text is the  'deploy' section.
+'meta' information about the project. Next is a list of libray declarations in Maven co-ordinate format. This is followed by the module name declaration in the form of name:<Module name>. This  can then be followed by a number of optional key:value declarations. Examples being jarName, main, destPath. The final section  is the   'deploy' section. Here is an example.
 
-Here is an example.
-=
 ```
 project{
     env{
