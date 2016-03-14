@@ -7,6 +7,7 @@ import Net
 import BuilderParsers
 import BuilderTypes
 import System.Environment
+import System.Process
 
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
