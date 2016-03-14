@@ -13,9 +13,8 @@ project{
     build{
       module{
          deps{
-         	org.apache.felix:org.apache.felix.configadmin:1.8.8
-		      cglib:cglib:3.1
-		      HTTPClient:HTTPClient:0.3-3
+		cglib:cglib:3.1
+		HTTPClient:HTTPClient:0.3-3
 		    }
          name      : moduleA
          destPath  : dest/aFolder
