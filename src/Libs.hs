@@ -9,7 +9,20 @@ import BuilderTypes
 import System.Environment
 import System.Process
 import Process
+import System.Directory
+import System.FilePath ((</>))
+import System.IO
+import Control.Monad
+import Data.List
+import System.Exit
 
+
+--import Control.Monad
+--import Data.List
+--import System.Directory
+--import System.FilePath ((</>))
+--import System.IO
+--import System.IO.Strict as Strict
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
 
@@ -86,7 +99,7 @@ compile' n proj = if isModule n proj then compileModule n  else putStrLn $ "Unkn
 compileModule m = putStrLn ("compiling module " ++ (show m))
 
 -- -----------------------------------------------------------
-compileJava :: Module -> IO ()
+compileJava :: Module -> IO (ExitCode)
 compileJava m = compileP (options m) (srcfiles m)
 
 -- java options as in javac <options> <source files>
@@ -94,9 +107,55 @@ options :: Module -> String
 options = undefined
 
 -- All *.java from srcRoot down in supplied module 
-srcfiles :: Module -> [FilePath]
-srcfiles = undefined
+srcfiles :: Module -> IO ([FilePath]) -- of CSV
+-- itemByNameInModule
+srcfiles m =
+   -- = 
+-- examine this again!!
+    case (itemByNameInModule m "srcPath") of
+      Left m -> return ([""::FilePath])
+      Right (Item ("srcPath", srcFldr) ) -> do
 
+       srcFls <- allJavaFilesFromFolder srcFldr 
+       return $  intersperse ", " srcFls
+
+
+-- ------------------------------------------------------------------------------------------------
+--  Some file and folder utilities
+-- all files in all folders from root folder where folders and files  satisfy the  filters fltrFld and fltrFile
+
+true :: FilePath -> Bool
+true _ = True
+
+isTestFldr :: FilePath -> Bool
+isTestFldr = isInfixOf "src\\test\\java"
+
+isJavaFile :: FilePath -> Bool
+isJavaFile = isInfixOf ".java"
+
+allJavaFilesFromFolder :: FilePath -> IO [FilePath]
+allJavaFilesFromFolder fp  = allFilesFromFolder true isJavaFile fp
+
+allFilesFromFolder :: (FilePath -> Bool) -> (FilePath -> Bool) -> FilePath -> IO [FilePath]
+allFilesFromFolder fltrFld fltrFile  fp = do
+  fldrs <- folders fp
+  fls <- mapM filesInFolder (filter fltrFld ( "." : fldrs))
+  return $ filter fltrFile (concat fls)
+
+
+-- all folders/sub folders from a given root
+folders :: FilePath -> IO [FilePath]
+folders fp  = do
+    items <- listDirectory fp
+    z'  <- filterM doesDirectoryExist $ map (fp </>) items
+    x'  <- mapM folders z'
+    return $ z' ++ (concat x') 
+
+filesInFolder :: FilePath -> IO [FilePath]
+filesInFolder  fp  = do
+    items <- listDirectory fp
+    filterM doesFileExist $ map (fp </>) items
+-- ----------------------------------------------------------------------------------------------------
 readArgs :: IO ()
 readArgs = do
     proj <-  parseProjectFile "project.txt"

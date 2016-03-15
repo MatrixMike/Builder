@@ -3,9 +3,11 @@
 
 module Process where
 import System.Process
-
-compileP :: String -> [FilePath] -> IO ()
-compileP opts src = undefined
+import System.Exit
+compileP :: String -> IO([FilePath]) -> IO (ExitCode)
+compileP opts src = do
+    (src':_) <- src
+    (system $ "javac " ++ opts ++ " " ++ src')
 
 main = do
-	system "java -version"
+    system "java -version"
