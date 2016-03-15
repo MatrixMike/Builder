@@ -101,12 +101,14 @@ compile' n proj =  do
   case x of 
     Left _ -> putStrLn $ "Unknown module " ++ (show n)
     Right m -> do
+      putStrLn $ "compiling " ++ (show n)
       compileJava m
       putStrLn "" 
    
 -- -----------------------------------------------------------
 compileJava :: Module -> IO (ExitCode)
-compileJava m = compileP (options m) (srcfiles m)
+-- (options m) 
+compileJava m = compileP (srcfiles m)
 
 -- java options as in javac <options> <source files>
 options :: Module -> String

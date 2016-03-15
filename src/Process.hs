@@ -4,10 +4,10 @@
 module Process where
 import System.Process
 import System.Exit
-compileP :: String -> IO([FilePath]) -> IO (ExitCode)
-compileP opts src = do
+compileP :: IO([FilePath]) -> IO (ExitCode)
+compileP  src = do
     (src':_) <- src
-    (system $ "javac " ++ opts ++ " " ++ src')
+    (system $ "javac " ++ src')
 
 main = do
     system "java -version"
