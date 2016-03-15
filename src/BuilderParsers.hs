@@ -30,7 +30,7 @@ rmvExtSpaces = unwords . words
 
 itemValue :: Parser String
 itemValue = 
-  many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/'  <|> char ',' <|> char ' '  )
+  many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/'  <|> char ',' <|> char ' ' <|> char ':')
    
 letterDigUndrDot :: Parser String
 letterDigUndrDot = 
@@ -214,17 +214,18 @@ moduleParser = do
   -- This is not very nice...
   x1     <-  many $ kwip "modDep" 
   spaces
-  
-  x2     <-  many $ kwip "destPath"
+  x2     <-  many $ kwip "srcPath"  
   spaces
-  x3     <-  many $ kwip "jarName"
+  x3    <-   many $ kwip "destPath"
   spaces
-  x4     <-  many $ kwip "main"
+  x4     <-  many $ kwip "jarName"
+  spaces
+  x5     <-  many $ kwip "main"
   spaces
   char '}'
   spaces
   let Item (_, mName) = name'
-  return $ Module mName ([name'] ++ x1 ++  x2 ++  x3 ++  x4) deps' 
+  return $ Module mName ([name'] ++ x1 ++  x2 ++  x3 ++  x4 ++ x5) deps' 
 
  
 -- ----------------------------------------------------------------------------

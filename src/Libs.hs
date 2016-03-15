@@ -94,10 +94,16 @@ compile :: [Name] -> Project -> IO ()
 compile [] proj = compile (moduleNames proj) proj
 compile ns proj = mapM_ (\n -> compile' n proj) ns
 
+--if isModule n proj then compileModule (n proj) else putStrLn $ "Unknown module " ++ (show n)
 compile' :: Name -> Project -> IO ()
-compile' n proj = if isModule n proj then compileModule n  else putStrLn $ "Unknown module " ++ (show n)
-compileModule m = putStrLn ("compiling module " ++ (show m))
-
+compile' n proj =  do
+  let x = moduleByName n proj
+  case x of 
+    Left _ -> putStrLn $ "Unknown module " ++ (show n)
+    Right m -> do
+      compileJava m
+      putStrLn "" 
+   
 -- -----------------------------------------------------------
 compileJava :: Module -> IO (ExitCode)
 compileJava m = compileP (options m) (srcfiles m)
@@ -159,6 +165,7 @@ filesInFolder  fp  = do
 readArgs :: IO ()
 readArgs = do
     proj <-  parseProjectFile "project.txt"
+    print proj
     case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do
@@ -166,7 +173,7 @@ readArgs = do
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of
                 Just action -> action args pr
-                Nothing     ->  putStrLn ("Error - unknown argument " ++ command)
+                Nothing     -> putStrLn ("Error - unknown argument " ++ command)
 
 
  -- javac_path : * /bin/...

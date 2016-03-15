@@ -20,51 +20,14 @@ project{
 
          name      : moduleA
                   
-         destPath  : dd
+         srcPath   : /sou
          destPath  : dd
 
          main      : bb/dd/dd/
       }
-     module{
-         deps{
-         	org.apache.felix:org.apache.felix.configadmin:1.8.8
-		    cglib:cglib:3.1
-		    HTTPClient:HTTPClient:0.3-3
-		    org.apache.felix:org.apache.felix.configadmin:1.8.8
-		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
-		    }
+     
+    
 
-         name      : moduleB
-        
-      }
-     module{
-         deps{
-         	org.apache.felix:org.apache.felix.configadmin:1.8.8
-		    cglib:cglib:3.1
-		    HTTPClient:HTTPClient:0.3-3
-		    org.apache.felix:org.apache.felix.configadmin:1.8.8
-		    org.eclipse.jetty:jetty-webapp:9.3.4.RC1
-		    }
-
-         name      : moduleD
-         modDep    : moduleE,  moduleA
-         destPath  : dd
-         destPath  : dd
-         jarName   : ee
-         main      : bb/dd/dd/
-      }
-
-      module{
-         deps{}
-		    
-         name      : moduleE
-         modDep    : moduleA
-         destPath  : dd
-         jarName   : ee
-         main      : ff
-
-
-       }
     }
 
     deploy{
