@@ -20,7 +20,7 @@ project{
 
          name      : moduleA
                   
-         srcPath   : /sou
+         srcPath   : C:/feefoAspects
          destPath  : dd
 
          main      : bb/dd/dd/
