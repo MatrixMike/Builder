@@ -106,7 +106,7 @@ compile' n proj =  do
       putStrLn "" 
    
 -- -----------------------------------------------------------
-compileJava :: Module -> IO (ExitCode)
+compileJava :: Module -> IO ExitCode
 -- (options m) 
 compileJava m = compileP (srcfiles m)
 
@@ -115,17 +115,17 @@ options :: Module -> String
 options = undefined
 
 -- All *.java from srcRoot down in supplied module 
-srcfiles :: Module -> IO ([FilePath]) -- of CSV
--- itemByNameInModule
+srcfiles :: Module -> IO [FilePath] -- of CSV
 srcfiles m =
-   -- = 
--- examine this again!!
-    case (itemByNameInModule m "srcPath") of
-      Left m -> return ([""::FilePath])
+    case (itemByNameInModule m "sourcepath") of
+      Left msg  -> do 
+        putStrLn msg
+        return [""::FilePath]
       Right (Item ("srcPath", srcFldr) ) -> do
-
        srcFls <- allJavaFilesFromFolder srcFldr 
        return $  intersperse ", " srcFls
+
+      Right (Item (_, _) ) -> return [""::FilePath]
 
 
 -- ------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ isJavaFile :: FilePath -> Bool
 isJavaFile = isInfixOf ".java"
 
 allJavaFilesFromFolder :: FilePath -> IO [FilePath]
-allJavaFilesFromFolder fp  = allFilesFromFolder true isJavaFile fp
+allJavaFilesFromFolder = allFilesFromFolder true isJavaFile 
 
 allFilesFromFolder :: (FilePath -> Bool) -> (FilePath -> Bool) -> FilePath -> IO [FilePath]
 allFilesFromFolder fltrFld fltrFile  fp = do
@@ -154,20 +154,19 @@ allFilesFromFolder fltrFld fltrFile  fp = do
 -- all folders/sub folders from a given root
 folders :: FilePath -> IO [FilePath]
 folders fp  = do
-    items <- listDirectory fp
-    z'  <- filterM doesDirectoryExist $ map (fp </>) items
+    itms <- listDirectory fp
+    z'  <- filterM doesDirectoryExist $ map (fp </>) itms
     x'  <- mapM folders z'
     return $ z' ++ (concat x') 
 
 filesInFolder :: FilePath -> IO [FilePath]
 filesInFolder  fp  = do
-    items <- listDirectory fp
-    filterM doesFileExist $ map (fp </>) items
+    itms <- listDirectory fp
+    filterM doesFileExist $ map (fp </>) itms
 -- ----------------------------------------------------------------------------------------------------
 readArgs :: IO ()
 readArgs = do
     proj <-  parseProjectFile "project.txt"
-    print proj
     case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do

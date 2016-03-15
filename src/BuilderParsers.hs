@@ -6,6 +6,7 @@ import Text.ParserCombinators.Parsec
 import BuilderTypes
 import Data.List
 import Data.List.Split
+import System.Directory
 
 sep :: Char
 sep = ':'
@@ -40,7 +41,7 @@ validateProject :: Either String Project -> Either String Project
 validateProject p = 
  case p of 
   Left msg  ->  Left msg
-  Right  p' ->  checkModDeps p' >>=  noDupOptionals >>= noDupModules
+  Right  p' ->  checkModDeps p'  >>=  noDupOptionals >>= noDupModules
 
 -- For each module look at the 'modDep' list. For each module 
 -- in that list does the module's 'modDep' list contain the module under examination?
@@ -106,7 +107,24 @@ checkModDeps' m =
       case listDups lst of
         [] -> Right m
         _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
--- ----------------------------------------------------------------------------
+-- -- ----------------------------------------------------------------------------
+-- checkSrcFolder :: Project -> IO (Either String Project)
+-- checkSrcFolder p = do
+--   let (Build mods) =  buil p
+--   case (mapM checkSrcFolder' ) of
+--     Left m -> return (Right p)
+--     Right m -> return (Right p) 
+
+
+
+checkSrcFolder' :: Module -> IO( Either String Module)
+checkSrcFolder' m = 
+  case itemByNameInModule m "srcfolder" of
+    Left _ -> return (Left "ooops1")
+    Right (Item (_, srcFldr)) -> do
+      ex <- doesDirectoryExist srcFldr
+      if ex then return $ (Right m) else return $ (Left "No such folder")
+
 
 
 parseProj :: IO (Either String Project)
@@ -214,7 +232,7 @@ moduleParser = do
   -- This is not very nice...
   x1     <-  many $ kwip "modDep" 
   spaces
-  x2     <-  many $ kwip "srcPath"  
+  x2     <-  many $ kwip "sourcepath"  
   spaces
   x3    <-   many $ kwip "destPath"
   spaces
