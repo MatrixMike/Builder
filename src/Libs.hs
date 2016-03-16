@@ -170,6 +170,7 @@ readArgs = do
     case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do
+
               (command:args) <- getArgs  
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of

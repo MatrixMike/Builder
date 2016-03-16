@@ -7,7 +7,7 @@ import BuilderTypes
 import Data.List
 import Data.List.Split
 import System.Directory
-
+import Control.Monad
 sep :: Char
 sep = ':'
 openBrace :: Char
@@ -108,19 +108,23 @@ checkModDeps' m =
         [] -> Right m
         _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
 -- -- ----------------------------------------------------------------------------
--- checkSrcFolder :: Project -> IO (Either String Project)
--- checkSrcFolder p = do
---   let (Build mods) =  buil p
---   case (mapM checkSrcFolder' ) of
---     Left m -> return (Right p)
---     Right m -> return (Right p) 
+checkSrcFolder :: Project -> IO (Either String Project)
+checkSrcFolder p = do
+  let (Build mods) =  buil p
+  z <- mapM (checkSrcFolder')  mods
+  --[Left "ooops1",Left "ooops1",Left "ooops1",Left "ooops1"]
+  print z
+  return $ Right p
+  -- case (mapM checkSrcFolder' ) of
+  --   Left m -> return (Right p)
+  --   Right m -> return (Right p) 
 
 
 
 checkSrcFolder' :: Module -> IO( Either String Module)
 checkSrcFolder' m = 
   case itemByNameInModule m "srcfolder" of
-    Left _ -> return (Left "ooops1")
+    Left _ -> return (Left $ "The  srcfolder supplied used by module " ++  (moduleName m) ++ " does not exist")
     Right (Item (_, srcFldr)) -> do
       ex <- doesDirectoryExist srcFldr
       if ex then return $ (Right m) else return $ (Left "No such folder")
