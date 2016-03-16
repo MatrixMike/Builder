@@ -20,7 +20,7 @@ project{
 
          name      : moduleA
                   
-         sourcepath   : C:/feefoAspects
+         sourcepath   : /Users/mike/haskell/Builderx
          destPath  : dd
 
          main      : bb/dd/dd/

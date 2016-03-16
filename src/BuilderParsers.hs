@@ -108,26 +108,25 @@ checkModDeps' m =
         [] -> Right m
         _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
 -- -- ----------------------------------------------------------------------------
-checkSrcFolder :: Project -> IO (Either String Project)
-checkSrcFolder p = do
+checkSrcFolder :: Either String Project -> IO (Either String Project)
+checkSrcFolder (Left m) = return $ Left m
+checkSrcFolder (Right p) = do
   let (Build mods) =  buil p
   z <- mapM (checkSrcFolder')  mods
   --[Left "ooops1",Left "ooops1",Left "ooops1",Left "ooops1"]
-  print z
-  return $ Right p
-  -- case (mapM checkSrcFolder' ) of
-  --   Left m -> return (Right p)
-  --   Right m -> return (Right p) 
-
-
+  putStrLn (show $ length z)
+  case length z of
+    0 -> return $ Right p 
+    _ -> return $ Left (show z)
+  
 
 checkSrcFolder' :: Module -> IO( Either String Module)
 checkSrcFolder' m = 
-  case itemByNameInModule m "srcfolder" of
-    Left _ -> return (Left $ "The  srcfolder supplied used by module " ++  (moduleName m) ++ " does not exist")
-    Right (Item (_, srcFldr)) -> do
-      ex <- doesDirectoryExist srcFldr
-      if ex then return $ (Right m) else return $ (Left "No such folder")
+  case itemByNameInModule m "sourcepath" of 
+    Left _ -> return (Left $ "The module " ++  (moduleName m) ++ " does not have a sourcepath defined.")
+    Right (Item (_, srcPath)) -> do
+      ex <- doesDirectoryExist srcPath
+      if ex then return $ (Right m) else return $ Left ("No such folder " ++ srcPath ++ " for module " ++ (moduleName m))
 
 
 
@@ -235,10 +234,10 @@ moduleParser = do
   spaces
   -- This is not very nice...
   x1     <-  many $ kwip "modDep" 
-  spaces
+  spaces 
   x2     <-  many $ kwip "sourcepath"  
   spaces
-  x3    <-   many $ kwip "destPath"
+  x3     <-  many $ kwip "destPath"
   spaces
   x4     <-  many $ kwip "jarName"
   spaces

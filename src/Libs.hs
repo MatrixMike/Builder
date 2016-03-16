@@ -121,7 +121,7 @@ srcfiles m =
       Left msg  -> do 
         putStrLn msg
         return [""::FilePath]
-      Right (Item ("srcPath", srcFldr) ) -> do
+      Right (Item ("sourcepath", srcFldr) ) -> do
        srcFls <- allJavaFilesFromFolder srcFldr 
        return $  intersperse ", " srcFls
 
@@ -164,13 +164,21 @@ filesInFolder  fp  = do
     itms <- listDirectory fp
     filterM doesFileExist $ map (fp </>) itms
 -- ----------------------------------------------------------------------------------------------------
+
+-- ---------  
 readArgs :: IO ()
 readArgs = do
-    proj <-  parseProjectFile "project.txt"
+    proj' <-  parseProjectFile "project.txt"
+    putStrLn (show proj')
+
+    proj  <-  checkSrcFolder proj'
+    -- validateProject :: Either String Project -> Either String Project
+    -- checkSrcFolder ::  Either String Project -> IO (Either String Project)
+    
     case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do
-
+              putStrLn (show proj)
               (command:args) <- getArgs  
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of
