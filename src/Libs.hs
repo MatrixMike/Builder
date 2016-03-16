@@ -169,8 +169,6 @@ filesInFolder  fp  = do
 readArgs :: IO ()
 readArgs = do
     proj' <-  parseProjectFile "project.txt"
-    putStrLn (show proj')
-
     proj  <-  checkSrcFolder proj'
     -- validateProject :: Either String Project -> Either String Project
     -- checkSrcFolder ::  Either String Project -> IO (Either String Project)
@@ -178,16 +176,10 @@ readArgs = do
     case validateProject proj of
           Left msg -> putStrLn msg
           Right pr -> do
-              putStrLn (show proj)
               (command:args) <- getArgs  
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of
                 Just action -> action args pr
                 Nothing     -> putStrLn ("Error - unknown argument " ++ command)
 
-
- -- javac_path : * /bin/...
- --       uber_jar {
- --        jar_name : *
- --        include_module : * mod1, mod2
  

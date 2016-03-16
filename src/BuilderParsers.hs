@@ -43,24 +43,6 @@ validateProject p =
   Left msg  ->  Left msg
   Right  p' ->  checkModDeps p'  >>=  noDupOptionals >>= noDupModules
 
--- For each module look at the 'modDep' list. For each module 
--- in that list does the module's 'modDep' list contain the module under examination?
--- circularModRefs :: Project -> Either String Project 
--- circularModRefs p = do
---   let allNames = moduleNames p
-
---   case (mapM (\x -> f x )  allNames) of
-
---     where 
---       f x =  
-
-
-
--- checker' :: Project -> Either String Project 
--- checker' p = r where
---   allNames = moduleNames p 
---   case Ma
-
 
 -- ----------------------------------------------------------------------------
 noDupModules :: Project -> Either String Project 
@@ -98,7 +80,6 @@ checkModDeps p = do
 
 checkModDeps' :: Module -> Either String Module
 checkModDeps' m =
-
   case itemByName "modDep" $ items m  of -- ls is csv
     Left _              -> Right m
     Right  x -> do
@@ -112,14 +93,11 @@ checkSrcFolder :: Either String Project -> IO (Either String Project)
 checkSrcFolder (Left m) = return $ Left m
 checkSrcFolder (Right p) = do
   let (Build mods) =  buil p
-  z <- mapM (checkSrcFolder')  mods
-  --[Left "ooops1",Left "ooops1",Left "ooops1",Left "ooops1"]
-  putStrLn (show $ length z)
-  case length z of
-    0 -> return $ Right p 
-    _ -> return $ Left (show z)
+  errs <- mapM (checkSrcFolder')  mods
+  case length errs of
+    0 -> return $ Right p -- all ok
+    _ -> return $ Left (show errs) 
   
-
 checkSrcFolder' :: Module -> IO( Either String Module)
 checkSrcFolder' m = 
   case itemByNameInModule m "sourcepath" of 
@@ -127,8 +105,7 @@ checkSrcFolder' m =
     Right (Item (_, srcPath)) -> do
       ex <- doesDirectoryExist srcPath
       if ex then return $ (Right m) else return $ Left ("No such folder " ++ srcPath ++ " for module " ++ (moduleName m))
-
-
+-- -- ----------------------------------------------------------------------------
 
 parseProj :: IO (Either String Project)
 parseProj =  parseProjectFile "project.txt"
@@ -143,7 +120,6 @@ parseProjectFile fn = do
       return (Left $ show msg)
     Right pr -> return $ Right pr
 -- ----------------------------------------------------------------------------
-
 projectParser :: Parser Project
 projectParser = do
   spaces >> string projectToken >> char openBrace >> spaces
@@ -250,10 +226,6 @@ moduleParser = do
 
  
 -- ----------------------------------------------------------------------------
-
-
-
-
 -- KeyWordItemParser
 kwip :: String -> Parser Item
 kwip keyWord = do
