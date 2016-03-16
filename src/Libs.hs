@@ -17,12 +17,6 @@ import Data.List
 import System.Exit
 
 
---import Control.Monad
---import Data.List
---import System.Directory
---import System.FilePath ((</>))
---import System.IO
---import System.IO.Strict as Strict
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
 
@@ -163,15 +157,12 @@ filesInFolder :: FilePath -> IO [FilePath]
 filesInFolder  fp  = do
     itms <- listDirectory fp
     filterM doesFileExist $ map (fp </>) itms
--- ----------------------------------------------------------------------------------------------------
 
--- ---------  
+-- -------------------------------------------------------------
 readArgs :: IO ()
 readArgs = do
     proj' <-  parseProjectFile "project.txt"
     proj  <-  checkSrcFolder proj'
-    -- validateProject :: Either String Project -> Either String Project
-    -- checkSrcFolder ::  Either String Project -> IO (Either String Project)
     
     case validateProject proj of
           Left msg -> putStrLn msg

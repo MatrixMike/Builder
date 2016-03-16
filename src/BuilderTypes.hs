@@ -24,7 +24,7 @@ itemByName nm (x:xs)
  | nm == n' = Right x
  | otherwise = itemByName nm xs 
  where Item (n', _) = x
-
+-- ------------------------------------------------------
 
 itemByNameInModule :: Module -> Name  -> Either String Item
 itemByNameInModule m n =itemByName n (items m) 
@@ -46,13 +46,14 @@ moduleByName n p =
             Build mods =  buil p
 -- ------------------------------------------------------
 
-
 itemNames :: Module -> [Name]
 itemNames m = [ n | Item (n, _) <- items m]
+-- ------------------------------------------------------
 
 -- Is the supplied name the name of a module
 isModule :: Name -> Project -> Bool
 isModule name proj =  name `elem` (moduleNames proj)
+-- ------------------------------------------------------
 
 -- Get a list of all module names in the project
 moduleNames :: Project -> [Name]
