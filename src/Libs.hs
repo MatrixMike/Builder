@@ -16,6 +16,10 @@ import Control.Monad
 import Data.List
 import System.Exit
 
+bldHomeLib :: IO(FilePath)
+bldHomeLib = do
+  hm <- getHomeDirectory 
+  return $ hm </> ".bldr" </> "lib"
 
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
