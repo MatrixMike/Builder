@@ -90,14 +90,13 @@ compile ns proj = mapM_ (\n -> compile' n proj) ns
 
 --if isModule n proj then compileModule (n proj) else putStrLn $ "Unknown module " ++ (show n)
 compile' :: Name -> Project -> IO ()
-compile' n proj =  do
-  let x = moduleByName n proj
-  case x of 
+compile' n proj =  
+  case moduleByName n proj of 
     Left _ -> putStrLn $ "Unknown module " ++ (show n)
     Right m -> do
-      putStrLn $ "compiling " ++ (show n)
+      putStrLn "compiling"
       compileJava m
-      putStrLn "" 
+      return () --putStrLn "" 
    
 -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
@@ -117,6 +116,7 @@ srcfiles m =
         return [""::FilePath]
       Right (Item ("sourcepath", srcFldr) ) -> do
        srcFls <- allJavaFilesFromFolder srcFldr 
+       putStrLn "src files "
        return $  intersperse ", " srcFls
 
       Right (Item (_, _) ) -> return [""::FilePath]
@@ -163,10 +163,14 @@ readArgs :: IO ()
 readArgs = do
     proj' <-  parseProjectFile "project.txt"
     proj  <-  checkSrcFolder proj'
-    
-    case validateProject proj of
-          Left msg -> putStrLn msg
+
+
+    case validateProject proj' of
+          Left msg -> do 
+            putStrLn msg
+            putStrLn "p======"
           Right pr -> do
+              putStrLn "project file parses ok."
               (command:args) <- getArgs  
               let res = lookup (rmvExtSpaces command) dispatch  
               case res of

@@ -20,7 +20,7 @@ project{
 
          name      : moduleA
                   
-         sourcepath   : /Users/mike/haskell/Builderx
+         sourcepath   : /Users/mike/haskell/Builder
          destPath  : dd
 
          main      : bb/dd/dd/
