@@ -21,29 +21,32 @@ bldHomeLib = do
   hm <- getHomeDirectory 
   return $ hm </> ".bldr" </> "lib"
 
-fqFileName :: String -> IO(String) 
+fqFileName :: String -> IO String 
 fqFileName fn = do
   homeLib <- bldHomeLib
   return $ homeLib </> fn
 
+fqFileNameSColon :: String -> IO String
+fqFileNameSColon fn = do
+  homeLib <- bldHomeLib
+  return $ homeLib </> (fn ++ ":")
+
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
-
 
 fName :: LibRef -> String
 fName l = (artifact l) ++ "-" ++ (version l) ++ ".jar"
 -- ----------------------------------------------------------------------------
 
 makeURL :: LibRef -> String
-makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l) 
-     where dotSlash  = map (\c -> if c == '.' then '/' else c)   
+makeURL l = mvnURL  ++ ( dotSlash (grp  l)) ++ "/" ++ (artifact l) ++ "/" ++ (version l) ++ "/" ++ (fName l) 
+ where dotSlash  = map (\c -> if c == '.' then '/' else c)   
       
 -- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
 downLoad' l = do 
   print l
   fq <- fqFileName (fName l)
-  print fq
   downLoad fq (makeURL l)
 -- ----------------------------------------------------------------------------
 
@@ -102,11 +105,10 @@ ldlibs [] proj = ldlibs (moduleNames proj) proj
 ldlibs mns proj = mapM_ (\n -> ldlibs' n proj) mns
 
 ldlibs' :: Name -> Project -> IO()
-ldlibs' n proj = do
+ldlibs' n proj = 
   case (moduleByName n proj) of 
-    Left _ -> putStrLn $ "Unknown module " ++ (show n)
-    Right md -> do
-      depRetriever $ deps md
+    Left _   -> putStrLn $ "Unknown module " ++ (show n)
+    Right md -> depRetriever $ deps md
 
 -- compile | compile <module-name>
 compile :: [Name] -> Project -> IO ()
@@ -125,24 +127,15 @@ compile' n proj =
    
 -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
--- (options m) 
 compileJava m = compileP (options m) (srcfiles m)
 
 -- java options as in javac <options> <source files>
-options :: Module -> IO [String]
+options :: Module -> IO String
 options md = do
-  -- fName uses libRef
-  let libs =  deps md
-  let jars = [ fqFileName (fName l) | l <- libs]
+  let jars = [ (fqFileNameSColon (fName l))  | l <- deps md]
   jars' <- sequence jars
-  print jars'
-  return jars'
-  -- sequence (intersperse ": " jars)
-  -- return ("")
--- ~/.bldr/libs/x.jar 
--- at the very least need to setup -cp ~/.bldr/libs/x.jar: ~/.bldr/libs/y.jar 
--- where x, y jars are from the deps.
-
+  return (unwords  jars')
+ 
 -- All *.java from srcRoot down in supplied module 
 srcfiles :: Module -> IO [FilePath] -- of CSV
 srcfiles m =
@@ -153,7 +146,7 @@ srcfiles m =
       Right (Item ("sourcepath", srcFldr) ) -> do
        srcFls <- allJavaFilesFromFolder srcFldr 
        putStrLn ("src files " ++ (show srcFls))
-       return $  intersperse ", " srcFls
+       return $   [unwords (intersperse " " srcFls)]
 
       Right (Item (_, _) ) -> return [""::FilePath]
 
@@ -199,7 +192,6 @@ readArgs :: IO ()
 readArgs = do
     proj' <-  parseProjectFile "project.txt"
     proj  <-  checkSrcFolder proj'
-
 
     case validateProject proj of
           Left msg -> do 
