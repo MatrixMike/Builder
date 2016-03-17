@@ -44,7 +44,7 @@ downLoad' l = do
   print l
   fq <- fqFileName (fName l)
   print fq
-  downLoad (fq) (makeURL l)
+  downLoad fq (makeURL l)
 -- ----------------------------------------------------------------------------
 
 depRetriever :: [LibRef] -> IO ()
@@ -126,11 +126,22 @@ compile' n proj =
 -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
 -- (options m) 
-compileJava m = compileP (srcfiles m)
+compileJava m = compileP (options m) (srcfiles m)
 
 -- java options as in javac <options> <source files>
-options :: Module -> String
-options = undefined
+options :: Module -> IO [String]
+options md = do
+  -- fName uses libRef
+  let libs =  deps md
+  let jars = [ fqFileName (fName l) | l <- libs]
+  jars' <- sequence jars
+  print jars'
+  return jars'
+  -- sequence (intersperse ": " jars)
+  -- return ("")
+-- ~/.bldr/libs/x.jar 
+-- at the very least need to setup -cp ~/.bldr/libs/x.jar: ~/.bldr/libs/y.jar 
+-- where x, y jars are from the deps.
 
 -- All *.java from srcRoot down in supplied module 
 srcfiles :: Module -> IO [FilePath] -- of CSV
