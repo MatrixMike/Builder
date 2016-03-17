@@ -165,7 +165,7 @@ readArgs = do
     proj  <-  checkSrcFolder proj'
 
 
-    case validateProject proj' of
+    case validateProject proj of
           Left msg -> do 
             putStrLn msg
             putStrLn "p======"

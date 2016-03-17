@@ -95,6 +95,7 @@ checkSrcFolder (Right p) = do
   let (Build mods) =  buil p
   errs <- mapM (checkSrcFolder')  mods
   case length errs of
+    this is wrong!!! 
     0 -> return $ Right p -- all ok
     _ -> return $ Left (show errs) 
   
