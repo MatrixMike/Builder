@@ -5,6 +5,7 @@ module BuilderParsers where
 import Text.ParserCombinators.Parsec
 import BuilderTypes
 import Data.List
+import Data.Either
 import Data.List.Split
 import System.Directory
 import Control.Monad
@@ -94,8 +95,8 @@ checkSrcFolder (Left m) = return $ Left m
 checkSrcFolder (Right p) = do
   let (Build mods) =  buil p
   errs <- mapM (checkSrcFolder')  mods
-  case length errs of
-    this is wrong!!! 
+  -- any error
+  case length (lefts errs) of
     0 -> return $ Right p -- all ok
     _ -> return $ Left (show errs) 
   

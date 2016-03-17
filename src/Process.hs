@@ -6,5 +6,9 @@ import System.Process
 import System.Exit
 compileP :: IO[FilePath] -> IO ExitCode
 compileP  src = do
-    (src':_) <- src
-    (system $ "javac " ++ src')
+	src' <- src
+	case src' of 
+		[] -> do
+			putStrLn "No source files found"
+			return ExitSuccess
+		_  -> (system $ "javac " ++ (show src'))
