@@ -21,6 +21,11 @@ bldHomeLib = do
   hm <- getHomeDirectory 
   return $ hm </> ".bldr" </> "lib"
 
+fqFileName :: String -> IO(String) 
+fqFileName fn = do
+  homeLib <- bldHomeLib
+  return $ homeLib </> fn
+
 mvnURL :: String
 mvnURL = "http://central.maven.org/maven2/"
 
@@ -37,7 +42,9 @@ makeURL l = mvnURL  ++ ( dotSlash (grp l)) ++ "/" ++ (artifact l) ++ "/" ++ (ver
 downLoad' :: LibRef -> IO ()
 downLoad' l = do 
   print l
-  downLoad (fName l) (makeURL l)
+  fq <- fqFileName (fName l)
+  print fq
+  downLoad (fq) (makeURL l)
 -- ----------------------------------------------------------------------------
 
 depRetriever :: [LibRef] -> IO ()
@@ -57,7 +64,8 @@ dispatch :: [(String, [String] -> Project -> IO ())]
 dispatch =  [("clean"  , clean  ),  
              ("compile", compile),
              ("build"  , build  ),
-             ("list"   , list   )]
+             ("list"   , list   ),
+             ("libs"   , ldlibs )]
 
 -- list | list <module-name>
 list :: [Name] -> Project -> IO ()
@@ -87,6 +95,19 @@ build' :: Name -> Project -> IO ()
 build' n proj = if isModule n proj then buildModule n else putStrLn $ "Unknown module " ++ (show n)
 buildModule m = putStrLn ("building  module " ++ (show m))
 
+-- ldlibs | ldlibs <module-name>
+
+ldlibs :: [Name] -> Project -> IO()
+ldlibs [] proj = ldlibs (moduleNames proj) proj
+ldlibs mns proj = mapM_ (\n -> ldlibs' n proj) mns
+
+ldlibs' :: Name -> Project -> IO()
+ldlibs' n proj = do
+  case (moduleByName n proj) of 
+    Left _ -> putStrLn $ "Unknown module " ++ (show n)
+    Right md -> do
+      depRetriever $ deps md
+
 -- compile | compile <module-name>
 compile :: [Name] -> Project -> IO ()
 compile [] proj = compile (moduleNames proj) proj
@@ -96,11 +117,11 @@ compile ns proj = mapM_ (\n -> compile' n proj) ns
 compile' :: Name -> Project -> IO ()
 compile' n proj =  
   case moduleByName n proj of 
-    Left _ -> putStrLn $ "Unknown module " ++ (show n)
+    Left _  -> putStrLn $ "Unknown module " ++ (show n)
     Right m -> do
-      putStrLn "compiling"
+      putStrLn "Compiling..."
       compileJava m
-      return () --putStrLn "" 
+      return () 
    
 -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
@@ -172,7 +193,6 @@ readArgs = do
     case validateProject proj of
           Left msg -> do 
             putStrLn msg
-            putStrLn "p======"
           Right pr -> do
               putStrLn "project file parses ok."
               (command:args) <- getArgs  

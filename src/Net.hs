@@ -10,7 +10,7 @@ import Network.Wreq
 import Control.Lens
 import Control.Exception
 
-downLoad :: String -> String -> IO ()
+downLoad :: FilePath -> String -> IO ()
 downLoad n u = do
     putStrLn $ "doing... " ++ n 
     r <- try $ get u
