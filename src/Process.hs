@@ -11,4 +11,4 @@ compileP  src = do
 		[] -> do
 			putStrLn "No source files found"
 			return ExitSuccess
-		_  -> (system $ "javac " ++ (show src'))
+		_  -> (system $ "javac " ++ (show srcFiles)) where (srcFiles:_) = src'

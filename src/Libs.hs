@@ -116,7 +116,7 @@ srcfiles m =
         return [""::FilePath]
       Right (Item ("sourcepath", srcFldr) ) -> do
        srcFls <- allJavaFilesFromFolder srcFldr 
-       putStrLn "src files "
+       putStrLn ("src files " ++ (show srcFls))
        return $  intersperse ", " srcFls
 
       Right (Item (_, _) ) -> return [""::FilePath]
