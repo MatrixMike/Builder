@@ -4,13 +4,21 @@
 module Process where
 import System.Process
 import System.Exit
-compileP :: IO String -> IO[FilePath] -> IO ExitCode
+compileP :: IO String -> IO FilePath -> IO ExitCode
 compileP opt  src = do
 	src' <- src
 	opt' <- opt
-	let optStr = show opt' 
+
+	
 	case src' of 
 		[] -> do
 			putStrLn "No source files found"
 			return ExitSuccess
-		_  -> (system $ "javac  -classpath .:" ++ optStr ++ " " ++ (show srcFiles)) where (srcFiles:_) = src'
+		_  -> do
+			putStrLn "Calling javac with "
+			putStrLn ("javac -verbose  -classpath " ++ opt' ++ ". " ++ ( src'))
+			(system $ "javac -verbose  -classpath " ++ opt' ++ ". " ++ ( src')) 
+
+
+
+

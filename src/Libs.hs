@@ -134,21 +134,23 @@ options :: Module -> IO String
 options md = do
   let jars = [ (fqFileNameSColon (fName l))  | l <- deps md]
   jars' <- sequence jars
-  return (unwords  jars')
+  return (concat  jars')
  
 -- All *.java from srcRoot down in supplied module 
-srcfiles :: Module -> IO [FilePath] -- of CSV
+srcfiles :: Module -> IO FilePath -- of CSV
 srcfiles m =
     case (itemByNameInModule m "sourcepath") of
       Left msg  -> do 
         putStrLn msg
-        return [""::FilePath]
+        return (""::FilePath)
       Right (Item ("sourcepath", srcFldr) ) -> do
-       srcFls <- allJavaFilesFromFolder srcFldr 
-       putStrLn ("src files " ++ (show srcFls))
-       return $   [unwords (intersperse " " srcFls)]
 
-      Right (Item (_, _) ) -> return [""::FilePath]
+       srcFls <- allJavaFilesFromFolder srcFldr -- :: IO [FilePath]
+-- srcFls ::  [FilePath]
+
+       return $   unwords ( srcFls)
+
+      Right (Item (_, _) ) -> return (""::FilePath)
 
 
 -- ------------------------------------------------------------------------------------------------

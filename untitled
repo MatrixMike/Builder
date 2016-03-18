@@ -1,0 +1,26 @@
+ 
+            org.apache.httpcomponents:httpclient:4.3.3
+            commons-configuration:commons-configuration:1.10
+            org.mongodb:mongo-java-driver:2.13.0
+            org.jongo:jongo:1.1
+       
+            org.eclipse.jetty:jetty-server:9.3.0.M1
+            org.eclipse.jetty:jetty-servlet:9.3.0.M1
+                
+            org.slf4j:slf4j-api:1.7.2
+            ch.qos.logback:logback-classic:1.0.9
+Need FULL path to jar, jars sep with : and source files sep with space.
+
+javac -classpath .:/Users/mike/.bldr/lib/logback-classic-1.0.9.jar:/Users/mike/.bldr/lib/slf4j-api-1.7.2.jar:/Users/mike/.bldr/lib/commons-configuration-1.10.jar:/Users/mike/.bldr/lib/jetty-server-9.3.0.M1.jar:/Users/mike/.bldr/lib/commons-lang3-3.4.jar:/Users/mike/.bldr/lib/jetty-servlet-9.3.0.M1.jar:/Users/mike/.bldr/lib/mongo-java-driver-2.13.0.jar:/Users/mike/.bldr/lib/httpclient-4.3.3.jar:/Users/mike/.bldr/lib/jongo-1.1.jar
+
+
+ /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/CoreVendorData.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/MerchantChecker.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/RewriteServer.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/mongo/MongoMerchantChecker.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/mongo/ProjectedMerchant.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/DefaultRedirectionHandler.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/RedirectionHandler.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/RewriteServlet.java
+
+
+
+
+javac -verbose  -classpath /Users/mike/.bldr/lib/httpclient-4.3.3.jar:/Users/mike/.bldr/lib/commons-configuration-1.10.jar:/Users/mike/.bldr/lib/mongo-java-driver-2.13.0.jar:/Users/mike/.bldr/lib/jongo-1.1.jar:/Users/mike/.bldr/lib/jetty-server-9.3.0.M1.jar:/Users/mike/.bldr/lib/jetty-servlet-9.3.0.M1.jar:/Users/mike/.bldr/lib/slf4j-api-1.7.2.jar:/Users/mike/.bldr/lib/logback-classic-1.0.9.jar /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/CoreVendorData.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/MerchantChecker.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/RewriteServer.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/mongo/MongoMerchantChecker.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/mongo/ProjectedMerchant.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/DefaultRedirectionHandler.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/RedirectionHandler.java /Users/mike/feefoV2/FeefoV2/urlRewrite/src/main/java/com/feefo/rewrite/servlet/RewriteServlet.java
+
+
+
+
