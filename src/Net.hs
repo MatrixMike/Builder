@@ -12,7 +12,8 @@ import Control.Exception
 
 downLoad :: FilePath -> String -> IO ()
 downLoad n u = do
-    putStrLn $ "doing... " ++ n 
+    putStrLn $ "downloading... " ++ n 
+    
     r <- try $ get u
     case r of
         -- Left (e::HttpException) -> do putStrLn "-------" 

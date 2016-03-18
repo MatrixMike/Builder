@@ -8,14 +8,13 @@ compileP :: String -> IO String -> IO FilePath -> IO ExitCode
 compileP name opt  src = do
 	src' <- src
 	opt' <- opt
-
 	
 	case src' of 
 		[] -> do
 			putStrLn "No source files found"
 			return ExitSuccess
-		_  -> do
-			(system $ "javac -d ./target/" ++ name ++ " -classpath " ++ opt' ++ ". " ++ ( src')) 
+		_  -> system $ "javac -d ./target/" ++ name ++
+			 " -classpath " ++ opt' ++ ". " ++ ( src') 
 
 
 

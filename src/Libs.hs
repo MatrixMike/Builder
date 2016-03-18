@@ -16,7 +16,7 @@ import Control.Monad
 import Data.List
 import System.Exit
 
-bldHomeLib :: IO(FilePath)
+bldHomeLib :: IO FilePath
 bldHomeLib = do
   hm <- getHomeDirectory 
   return $ hm </> ".bldr" </> "lib"
@@ -24,7 +24,7 @@ bldHomeLib = do
 target  :: Name -> IO FilePath 
 target mn = do
    dr <-  getCurrentDirectory 
-   return $ dr </> ("target") </> mn
+   return $ dr </> "target" </> mn
 
 fqFileName :: String -> IO String 
 fqFileName fn = do
@@ -50,9 +50,11 @@ makeURL l = mvnURL  ++ ( dotSlash (grp  l)) ++ "/" ++ (artifact l) ++ "/" ++ (ve
 -- ----------------------------------------------------------------------------
 downLoad' :: LibRef -> IO ()
 downLoad' l = do 
-  print l
-  fq <- fqFileName (fName l)
-  downLoad fq (makeURL l)
+  fq     <- fqFileName (fName l)
+  exists <- doesFileExist fq
+  case exists  of
+     True  -> putStrLn ("File previously downloaded. Skipping " ++ (fName l))
+     False -> downLoad fq (makeURL l)
 -- ----------------------------------------------------------------------------
 
 depRetriever :: [LibRef] -> IO ()
@@ -94,18 +96,16 @@ clean' :: Name -> Project -> IO ()
 clean' n proj = if isModule n proj then cleanModule n else putStrLn $ "Unknown module " ++ (show n)
 cleanModule m = do
   putStrLn ("cleanimg  module " ++  m)
-  t <- target m
-  let x = doesDirectoryExist t
-  exists <- x
+  t <- target m 
+  exists <- doesDirectoryExist t
 
   case exists of
     True -> do
-      removeDirectoryRecursive t
-      createDirectoryIfMissing True t 
+              removeDirectoryRecursive t
+              createDirectoryIfMissing True t 
     False ->  createDirectoryIfMissing True t 
       
-      
-
+    
 -- build | build <module-name>
 build :: [Name] -> Project -> IO ()
 build [] proj = build (moduleNames proj) proj
@@ -116,7 +116,6 @@ build' n proj = if isModule n proj then buildModule n else putStrLn $ "Unknown m
 buildModule m = putStrLn ("building  module " ++ (show m))
 
 -- ldlibs | ldlibs <module-name>
-
 ldlibs :: [Name] -> Project -> IO()
 ldlibs [] proj = ldlibs (moduleNames proj) proj
 ldlibs mns proj = mapM_ (\n -> ldlibs' n proj) mns
@@ -159,12 +158,9 @@ srcfiles m =
     case (itemByNameInModule m "sourcepath") of
       Left msg  -> do 
         putStrLn msg
-        return (""::FilePath)
+        return ""
       Right (Item ("sourcepath", srcFldr) ) -> do
-
-       srcFls <- allJavaFilesFromFolder srcFldr -- :: IO [FilePath]
--- srcFls ::  [FilePath]
-
+       srcFls <- allJavaFilesFromFolder srcFldr
        return $   unwords srcFls
 
       Right (Item (_, _) ) -> return (""::FilePath)
