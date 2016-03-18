@@ -4,8 +4,8 @@
 module Process where
 import System.Process
 import System.Exit
-compileP :: IO String -> IO FilePath -> IO ExitCode
-compileP opt  src = do
+compileP :: String -> IO String -> IO FilePath -> IO ExitCode
+compileP name opt  src = do
 	src' <- src
 	opt' <- opt
 
@@ -15,9 +15,7 @@ compileP opt  src = do
 			putStrLn "No source files found"
 			return ExitSuccess
 		_  -> do
-			putStrLn "Calling javac with "
-			putStrLn ("javac -verbose  -classpath " ++ opt' ++ ". " ++ ( src'))
-			(system $ "javac -verbose  -classpath " ++ opt' ++ ". " ++ ( src')) 
+			(system $ "javac -d ./target/" ++ name ++ " -classpath " ++ opt' ++ ". " ++ ( src')) 
 
 
 

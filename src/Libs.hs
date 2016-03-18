@@ -21,6 +21,11 @@ bldHomeLib = do
   hm <- getHomeDirectory 
   return $ hm </> ".bldr" </> "lib"
 
+target  :: Name -> IO FilePath 
+target mn = do
+   dr <-  getCurrentDirectory 
+   return $ dr </> ("target") </> mn
+
 fqFileName :: String -> IO String 
 fqFileName fn = do
   homeLib <- bldHomeLib
@@ -87,7 +92,20 @@ clean ns proj = mapM_ (\n -> clean' n proj) ns
 
 clean' :: Name -> Project -> IO ()
 clean' n proj = if isModule n proj then cleanModule n else putStrLn $ "Unknown module " ++ (show n)
-cleanModule m = putStrLn ("cleanimg  module " ++ (show m))
+cleanModule m = do
+  putStrLn ("cleanimg  module " ++  m)
+  t <- target m
+  let x = doesDirectoryExist (t)
+
+  exists <- x
+
+  case exists of
+    True -> do
+      removeDirectoryRecursive t
+      createDirectoryIfMissing True t 
+    False ->  createDirectoryIfMissing True t 
+      
+      
 
 -- build | build <module-name>
 build :: [Name] -> Project -> IO ()
@@ -127,7 +145,7 @@ compile' n proj =
    
 -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
-compileJava m = compileP (options m) (srcfiles m)
+compileJava m = compileP (moduleName m) (options m) (srcfiles m)
 
 -- java options as in javac <options> <source files>
 options :: Module -> IO String
