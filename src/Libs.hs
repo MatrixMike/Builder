@@ -66,11 +66,11 @@ errHandler e = putStrLn $ "ERROR! " ++ (show e)
    -- | InvalidUrlException e = putStrLn "The file doesn't exist!"    
     -- | otherwise = ioError e  
 -- ----------------------------------------------------------------------------
-     
+
 -- libsMain :: IO ()
 -- libsMain = (parseProjectFile "project.txt" ) `catchIOError` errHandler
 
-dispatch :: [(String, [String] -> Project -> IO ())]  
+dispatch :: [(String, [Name] -> Project -> IO ())]  
 dispatch =  [("clean"  , clean  ),  
              ("compile", compile),
              ("build"  , build  ),
@@ -137,11 +137,20 @@ compile' n proj =
   case moduleByName n proj of 
     Left _  -> putStrLn $ "Unknown module " ++ (show n)
     Right m -> do
-      putStrLn "Compiling..."
+      putStrLn ("Compiling " ++ n ++ "...")
       compileJava m
       return () 
-   
--- -----------------------------------------------------------
+
+
+-- e.g. clean libs compile | clean libs compile <module-name>
+multiActions :: [Name] -> Project -> [[Name] -> Project  -> IO ()] -> IO () 
+multiActions ns p [] = return () 
+multiActions ns p (f:fns) = do
+  _ <- f ns p
+  multiActions ns p fns
+
+
+ -- -----------------------------------------------------------
 compileJava :: Module -> IO ExitCode
 compileJava m = compileP (moduleName m) (options m) (srcfiles m)
 
