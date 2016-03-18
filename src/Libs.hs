@@ -95,8 +95,7 @@ clean' n proj = if isModule n proj then cleanModule n else putStrLn $ "Unknown m
 cleanModule m = do
   putStrLn ("cleanimg  module " ++  m)
   t <- target m
-  let x = doesDirectoryExist (t)
-
+  let x = doesDirectoryExist t
   exists <- x
 
   case exists of
@@ -166,7 +165,7 @@ srcfiles m =
        srcFls <- allJavaFilesFromFolder srcFldr -- :: IO [FilePath]
 -- srcFls ::  [FilePath]
 
-       return $   unwords ( srcFls)
+       return $   unwords srcFls
 
       Right (Item (_, _) ) -> return (""::FilePath)
 
@@ -214,7 +213,7 @@ readArgs = do
     proj  <-  checkSrcFolder proj'
 
     case validateProject proj of
-          Left msg -> do 
+          Left msg ->  
             putStrLn msg
           Right pr -> do
               putStrLn "project file parses ok."
