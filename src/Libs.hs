@@ -232,6 +232,6 @@ readArgs = do
                 Left m -> print m
                 Right (Args cmds mods) -> do
                   let maybeAct  = [ lookup (rmvExtSpaces cmd) dispatch | cmd <- cmds  ]  
-                  let justAct = [ act | Just act <- maybeAct ]
+                  let justAct   = [ act | Just act <- maybeAct ]
 
                   multiActions mods pr  justAct
