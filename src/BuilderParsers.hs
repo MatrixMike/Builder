@@ -127,13 +127,14 @@ argsParser = do
       mods <- many1 wd
       return $ Args cmds mods
 
--- parseC = do
---     ma <- optionMaybe parseA
---     case ma of
---         Just a -> return $ convertA a
---         Nothing -> parseB
- -- bldr clean compile build -m m1 m2 m3 
- 
+--parseArgs :: String -> Either (String Args)
+parseArgs args  = 
+  case (parse argsParser "Parsing args" args) of
+    Left m -> return $ (Left (show m))
+    Right a -> return $ Right a
+
+
+
 parseProj :: IO (Either String Project)
 parseProj =  parseProjectFile "project.txt"
 
@@ -299,7 +300,6 @@ simpleComment = do
   manyTill anyChar (try (string "-->"))
 
 
--- Note the overlapping parsers anyChar and string "-->", and therefore the use of the try combinator. 
 
 
 

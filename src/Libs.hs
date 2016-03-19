@@ -224,11 +224,14 @@ readArgs = do
             putStrLn msg
           Right pr -> do
               putStrLn "project file parses ok."
-              (command:args) <- getArgs  
-              let res = lookup (rmvExtSpaces command) dispatch  
-              case res of
-                Just action -> action args pr
-                Nothing     -> putStrLn ("Error - unknown argument " ++ command)
 
--- bldr clean compile build -m m1 m2 m3 
- 
+              argStr <- getArgs
+              args <- parseArgs (unlines argStr)
+              print args
+              case args of
+                Left m -> print m
+                Right (Args cmds mods) -> do
+                  let maybeAct  = [ lookup (rmvExtSpaces cmd) dispatch | cmd <- cmds  ]  
+                  let justAct = [ act | Just act <- maybeAct ]
+
+                  multiActions mods pr  justAct
