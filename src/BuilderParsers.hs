@@ -2,13 +2,13 @@
 {-# OPTIONS -Wall -fwarn-tabs -fno-warn-type-defaults -fno-warn-unused-do-bind #-}
 module BuilderParsers where
 
-import Text.ParserCombinators.Parsec
-import BuilderTypes
-import Data.List
-import Data.Either
-import Data.List.Split
-import System.Directory
-import Control.Monad
+import           BuilderTypes
+import           Control.Monad
+import           Data.Either
+import           Data.List
+import           Data.List.Split
+import           System.Directory
+import           Text.ParserCombinators.Parsec
 sep :: Char
 sep = ':'
 openBrace :: Char
@@ -31,33 +31,33 @@ rmvExtSpaces :: String -> String
 rmvExtSpaces = unwords . words
 
 itemValue :: Parser String
-itemValue = 
+itemValue =
   many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-' <|> char '/'  <|> char ',' <|> char ' ' <|> char ':')
-   
+
 letterDigUndrDot :: Parser String
-letterDigUndrDot = 
+letterDigUndrDot =
    many1 (letter <|> digit <|> char '_' <|> char '.' <|> char '-')
 
 validateProject :: Either String Project -> Either String Project
-validateProject p = 
- case p of 
+validateProject p =
+ case p of
   Left msg  ->  Left msg
   Right  p' ->  checkModDeps p'  >>=  noDupOptionals >>= noDupModules
 
 
 -- ----------------------------------------------------------------------------
-noDupModules :: Project -> Either String Project 
-noDupModules p 
+noDupModules :: Project -> Either String Project
+noDupModules p
   | x \\ nub x == [] = Right p
   | otherwise = Left ( "Duplicate module names: " ++ (show diff))
   where
-    diff = x \\ nub x 
-    x = moduleNames p   
+    diff = x \\ nub x
+    x = moduleNames p
 -- ----------------------------------------------------------------------------
 noDupOptionals :: Project -> Either String Project
-noDupOptionals p  = do 
+noDupOptionals p  = do
   let (Build mods) =  buil p
-  case (mapM noDupOptionals' mods) of 
+  case (mapM noDupOptionals' mods) of
     Left  m -> Left m
     Right _ -> Right p
 
@@ -69,13 +69,13 @@ noDupOptionals' m
    where
     diff = listDups $ itemNames m
 
-listDups :: Eq a => [a] -> [a] 
+listDups :: Eq a => [a] -> [a]
 listDups xs = xs \\ nub xs
 -- ----------------------------------------------------------------------------
 checkModDeps :: Project -> Either String Project
 checkModDeps p = do
   let (Build mods) =  buil p
-  case (mapM checkModDeps' mods) of 
+  case (mapM checkModDeps' mods) of
     Left  m -> Left m
     Right _ -> Right p
 
@@ -88,7 +88,7 @@ checkModDeps' m =
       let lst = splitOn "," ls
       case listDups lst of
         [] -> Right m
-        _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls)) 
+        _  -> Left ("Duplicate module names in module dep list: " ++ (show $ moduleName m) ++ " --> " ++ (show ls))
 -- -- ----------------------------------------------------------------------------
 checkSrcFolder :: Either String Project -> IO (Either String Project)
 checkSrcFolder (Left m) = return $ Left m
@@ -98,11 +98,11 @@ checkSrcFolder (Right p) = do
   -- any error
   case length (lefts errs) of
     0 -> return $ Right p -- all ok
-    _ -> return $ Left (show errs) 
-  
+    _ -> return $ Left (show errs)
+
 checkSrcFolder' :: Module -> IO( Either String Module)
-checkSrcFolder' m = 
-  case itemByNameInModule m "sourcepath" of 
+checkSrcFolder' m =
+  case itemByNameInModule m "sourcepath" of
     Left _ -> return (Left $ "The module " ++  (moduleName m) ++ " does not have a sourcepath defined.")
     Right (Item (_, srcPath)) -> do
       ex <- doesDirectoryExist srcPath
@@ -117,7 +117,7 @@ parseProjectFile fn = do
   prj <- readFile fn
   let p = parse projectParser "Parsing project" prj
   case p of
-    Left msg -> do 
+    Left msg -> do
       print msg
       return (Left $ show msg)
     Right pr -> return $ Right pr
@@ -211,9 +211,9 @@ moduleParser = do
   name'  <-         kwip "name"
   spaces
   -- This is not very nice...
-  x1     <-  many $ kwip "modDep" 
-  spaces 
-  x2     <-  many $ kwip "sourcepath"  
+  x1     <-  many $ kwip "modDep"
+  spaces
+  x2     <-  many $ kwip "sourcepath"
   spaces
   x3     <-  many $ kwip "destPath"
   spaces
@@ -224,9 +224,9 @@ moduleParser = do
   char '}'
   spaces
   let Item (_, mName) = name'
-  return $ Module mName ([name'] ++ x1 ++  x2 ++  x3 ++  x4 ++ x5) deps' 
+  return $ Module mName ([name'] ++ x1 ++  x2 ++  x3 ++  x4 ++ x5) deps'
 
- 
+
 -- ----------------------------------------------------------------------------
 -- KeyWordItemParser
 kwip :: String -> Parser Item
@@ -246,21 +246,21 @@ int =  fmap read  (many1 digit)
 testLibRefParser :: String
 testLibRefParser = do
   let  lref = parse libRefParser "Libref" "org.apache.felix:org.apache.felix.bundlerepository:2.0.6"
-  case lref of 
+  case lref of
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
 testManyLibRefParser :: String
 testManyLibRefParser = do
   let  lref = parse (many libRefParser) "Libref" ""
-  case lref of 
+  case lref of
     Left err  ->  show err
     Right val ->  show val
 -------------------------------------------------------------------
 testDepsParser :: String -> String
-testDepsParser text = do 
+testDepsParser text = do
   let lref = parse depsParser "LibRef" text
-  case lref of 
+  case lref of
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
