@@ -108,7 +108,32 @@ checkSrcFolder' m =
       ex <- doesDirectoryExist srcPath
       if ex then return $ (Right m) else return $ Left ("No such folder " ++ srcPath ++ " for module " ++ (moduleName m))
 -- -- ----------------------------------------------------------------------------
+data  Args = Args [Name] [Name] deriving (Show)
+wd :: Parser String
+wd = do
+  spaces
+  wd <- many1 letter
+  spaces
+  return wd
 
+argsParser :: Parser Args
+argsParser = do
+  spaces
+  cmds <- many1 wd
+  hasM <- optionMaybe (string "-m")
+  case hasM of
+    Nothing -> return $ Args cmds []
+    Just _  -> do
+      mods <- many1 wd
+      return $ Args cmds mods
+
+-- parseC = do
+--     ma <- optionMaybe parseA
+--     case ma of
+--         Just a -> return $ convertA a
+--         Nothing -> parseB
+ -- bldr clean compile build -m m1 m2 m3 
+ 
 parseProj :: IO (Either String Project)
 parseProj =  parseProjectFile "project.txt"
 
@@ -137,10 +162,10 @@ projectParser = do
 -- ----------------------------------------------------------------------------
 envParser :: Parser Env
 envParser = do
-  spaces
+  sp
   string envToken
   char openBrace
-  spaces
+  sp
   char closeBrace
   return $ "env..."
 -- ----------------------------------------------------------------------------
@@ -264,7 +289,17 @@ testDepsParser text = do
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
+sp = do 
+  spaces
+  many simpleComment
+  spaces
 
+simpleComment = do
+  string "<!--"
+  manyTill anyChar (try (string "-->"))
+
+
+-- Note the overlapping parsers anyChar and string "-->", and therefore the use of the try combinator. 
 
 
 

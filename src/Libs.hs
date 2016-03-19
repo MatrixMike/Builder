@@ -212,6 +212,8 @@ filesInFolder  fp  = do
     filterM doesFileExist $ map (fp </>) itms
 
 -- -------------------------------------------------------------
+
+
 readArgs :: IO ()
 readArgs = do
     proj' <-  parseProjectFile "project.txt"
@@ -228,4 +230,5 @@ readArgs = do
                 Just action -> action args pr
                 Nothing     -> putStrLn ("Error - unknown argument " ++ command)
 
+-- bldr clean compile build -m m1 m2 m3 
  
