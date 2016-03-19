@@ -17,17 +17,17 @@ data Module  = Module  {mName::Name, items :: [Item], deps :: Deps}  deriving (S
 data Build   = Build   [Module] deriving (Show)
 data Project = Project {env :: Env, buil :: Build, deploy :: Deploy} deriving (Show)
 
--- Get an item by Name from a list of Item 
+-- Get an item by Name from a list of Item
 itemByName :: Name -> [Item] -> Either String Item
 itemByName nm [] = Left ("No Item with name:" ++ (show nm))
 itemByName nm (x:xs)
  | nm == n' = Right x
- | otherwise = itemByName nm xs 
+ | otherwise = itemByName nm xs
  where Item (n', _) = x
 -- ------------------------------------------------------
 
 itemByNameInModule :: Module -> Name  -> Either String Item
-itemByNameInModule m n =itemByName n (items m) 
+itemByNameInModule m n =itemByName n (items m)
 
 -- ------------------------------------------------------
 moduleName :: Module -> Value
@@ -42,7 +42,7 @@ moduleByName n p =
         []     -> Left ("No module with name: " ++ (show n))
         (a:[]) -> Right a
         (_:_)  -> Left ("Duplicate modeules with name: " ++ (show n)) -- won't happen!
-        where 
+        where
             Build mods =  buil p
 -- ------------------------------------------------------
 
