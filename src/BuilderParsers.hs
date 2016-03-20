@@ -163,10 +163,10 @@ projectParser = do
 -- ----------------------------------------------------------------------------
 envParser :: Parser Env
 envParser = do
-  sp
+  spaces
   string envToken
   char openBrace
-  sp
+  spaces
   char closeBrace
   return $ "env..."
 -- ----------------------------------------------------------------------------
@@ -290,16 +290,5 @@ testDepsParser text = do
     Left err  ->  show err
     Right val ->  show val
 -- ----------------------------------------------------------------------------
-sp = do 
-  spaces
-  many simpleComment
-  spaces
-
-simpleComment = do
-  string "<!--"
-  manyTill anyChar (try (string "-->"))
-
-
-
 
 
