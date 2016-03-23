@@ -154,13 +154,15 @@ main = do
     let fname' = fromJust fname
     let action = optAction opts
     content <- readFile fname'
-
-    case parse parseInstructions fname' content of
-        Left e     -> print e
-        Right insns -> do 
-            if action == ParseOnly
-                then print insns
-                else evalStateT (runInstructions insns) (0, M.empty)
+    if action == ParseOnly then 
+        case parse parseInstructions fname' content of
+            Left e      -> print e
+            Right insns -> print insns 
+    else 
+         case parse parseInstructions fname' content of
+            Left e      -> print e
+            Right insns -> evalStateT (runInstructions insns) (0, M.empty)
+        
 
 
 
