@@ -5,6 +5,7 @@ import Control.Monad
 import Text.ParserCombinators.Parsec hiding ((<|>), many)
 import Debug.Trace
 
+anyMany cs ps  =  foldr (\p rs -> rs ++ [(\cs -> parse p cs) ]) [] ps
 
 
 data JSONValue = B Bool | S String | A [JSONValue] | O [(String, JSONValue)] deriving (Show)
@@ -21,7 +22,6 @@ comment = string "//"
     *>
     (many (noneOf ['\n']))
 
- 
 
 lexeme :: Parser a -> Parser a
 lexeme p = p <* ws
@@ -73,6 +73,7 @@ array =
 
 
 jsonArray :: Parser JSONValue
+-- fmap the constructor A over array to give JSON value
 jsonArray = A <$> array     
 
 objectEntry :: Parser (String, JSONValue)
