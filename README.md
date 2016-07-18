@@ -31,7 +31,6 @@ project{
 }
 ```
 
-(Repo also contains a BF parser - at least until I find suitable home for it)
 
 
 
